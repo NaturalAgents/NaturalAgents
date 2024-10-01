@@ -1,0 +1,24 @@
+# Ignore .env files
+**/.env
+
+# Node.js dependencies
+node_modules
+
+# Vercel build output
+.vercel
+**/.next
+
+# Python bytecode files
+*.pyc
+*.pyo
+
+# Python __pycache__ directories
+__pycache__/
+**/__pycache__/
+
+# Typescript
+tsconfig.tsbuildinfo
+
+# ignore ipynb files
+*.ipynb
+*.DS_Store
