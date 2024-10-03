@@ -5,7 +5,7 @@ services:
     build:
       context: ./backend
     ports:
-      - "5000"
+      - "3001:5000"
     networks:
       - app-network
 
@@ -18,6 +18,10 @@ services:
       - app-network
     depends_on:
       - backend
+    volumes:
+      - ./frontend:/usr/src/app
+      - /usr/src/app/node_modules
+      - /usr/src/app/.next
 
 networks:
   app-network:

@@ -17,9 +17,9 @@ export default function PlaygroundPage() {
   const [isSideViewOpen, setIsSideViewOpen] = useState(true); // State for managing side view visibility
   const editorRef = useRef(null);
 
-  const handleRunClick = () => {
+  const handleRunClick = async () => {
     setIsSideViewOpen(true); // Open side view when Run is clicked
-    runDocument(editorRef);
+    await runDocument(editorRef);
   };
 
   const handleCloseSideView = () => {
