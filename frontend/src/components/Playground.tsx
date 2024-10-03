@@ -4,9 +4,13 @@ import { useState } from "react";
 import { CiLocationArrow1 } from "react-icons/ci";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import Editor from "./command/CommandEditor";
+
+import dynamic from "next/dynamic";
+
 import { ResizablePanel, ResizablePanelGroup } from "./ui/resizable";
 import OutputRender from "./command/OutputRender";
+
+const Editor = dynamic(() => import("./command/CommandEditor"), { ssr: false });
 
 export default function PlaygroundPage() {
   const [isSideViewOpen, setIsSideViewOpen] = useState(true); // State for managing side view visibility
