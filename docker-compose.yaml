@@ -8,6 +8,8 @@ services:
       - "3001:5000"
     networks:
       - app-network
+    volumes:
+      - ./workspace:/workspace # Mounting /tmp from host to /tmp in the container
 
   frontend:
     build:

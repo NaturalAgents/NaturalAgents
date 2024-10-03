@@ -22,3 +22,6 @@ tsconfig.tsbuildinfo
 # ignore ipynb files
 *.ipynb
 *.DS_Store
+
+# User storage
+**/workspace/

@@ -1,9 +1,8 @@
-from fastapi import FastAPI, HTTPException
-from fastapi.middleware import Middleware
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from typing import Any
-
+from events.run import processPayload
+import json 
 
 app = FastAPI()
 
@@ -28,7 +27,9 @@ def read_data():
 @app.post("/api/data")
 def receive_data(data: DataModel):
     # Process the received data
-    return {"message": "Data received", "content": data.content}
+    response = processPayload(data.content)
+
+    return {"message": json.dumps(response)}
 
 
 app.add_middleware(
