@@ -1,7 +1,8 @@
 import { createReactBlockSpec } from "@blocknote/react";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
-
+import { useRef } from "react";
+import { PartialBlock } from "@blocknote/core";
 // Function to map color to classes
 const getColorClass = (color: string) => {
   switch (color) {
@@ -30,7 +31,7 @@ export const Bubble = createReactBlockSpec(
         values: ["blue", "green", "red", "orange"], // Define allowed colors
       },
     },
-    content: "none", // No rich text content; the button itself is the main content
+    content: "inline", // No rich text content; the button itself is the main content
   },
   {
     render: (props) => {
@@ -47,11 +48,13 @@ export const Bubble = createReactBlockSpec(
           </Label>
           <span className="text-sm underline">Prompt</span>
           <div
+            ref={props.contentRef}
             contentEditable
             suppressContentEditableWarning // Prevent React warning for editable content
             id="cardInput"
             className="border-none focus:outline-none w-full min-h-[100px] placeholder-gray-400"
             style={{ padding: "8px" }} // Padding for the editable area
+            // onInput={handleInput} // Call handleInput on input
           ></div>
         </Card>
       );

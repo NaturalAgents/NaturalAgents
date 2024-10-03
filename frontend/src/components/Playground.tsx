@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { CiLocationArrow1 } from "react-icons/ci";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -9,14 +9,17 @@ import dynamic from "next/dynamic";
 
 import { ResizablePanel, ResizablePanelGroup } from "./ui/resizable";
 import OutputRender from "./command/OutputRender";
-
+import { EditorContext } from "./context/editorcontext";
+import { runDocument } from "./services/api";
 const Editor = dynamic(() => import("./command/CommandEditor"), { ssr: false });
 
 export default function PlaygroundPage() {
   const [isSideViewOpen, setIsSideViewOpen] = useState(true); // State for managing side view visibility
+  const editorRef = useRef(null);
 
   const handleRunClick = () => {
     setIsSideViewOpen(true); // Open side view when Run is clicked
+    runDocument(editorRef);
   };
 
   const handleCloseSideView = () => {
@@ -46,9 +49,10 @@ export default function PlaygroundPage() {
 
           <ResizablePanelGroup direction="horizontal">
             <ResizablePanel>
-              <Editor />
+              <EditorContext.Provider value={editorRef}>
+                <Editor />
+              </EditorContext.Provider>
             </ResizablePanel>
-            {/* {isSideViewOpen && <Separator orientation="vertical" />} */}
 
             {isSideViewOpen && (
               <div className="border border-gray-300 w-1/2 h-screen overflow-y-scroll	bg-white">

@@ -1,10 +1,8 @@
 "use client";
 
 import { BlockNoteEditor, filterSuggestionItems } from "@blocknote/core";
-import "@blocknote/core/fonts/inter.css";
 import {
   DefaultReactSuggestionItem,
-  getDefaultReactSlashMenuItems,
   SuggestionMenuController,
   useCreateBlockNote,
 } from "@blocknote/react";
@@ -20,6 +18,7 @@ import {
 
 import { schema } from "./customschema/Schema";
 import { useState } from "react";
+import { useEditor } from "../context/editorcontext";
 
 // List containing all default Slash Menu Items, as well as our custom one.
 const getCustomSlashMenuItems = (
@@ -39,6 +38,9 @@ const Editor = () => {
   // Creates a new editor instance.
   const editor = useCreateBlockNote({ schema });
   const [title, setTitle] = useState(""); // State for the title
+
+  const editorRef = useEditor();
+  editorRef.current = editor;
 
   return (
     <div className="flex flex-1 items-center px-4 py-6 w-full">
