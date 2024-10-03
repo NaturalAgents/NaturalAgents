@@ -84,7 +84,7 @@ export const imageGenerationItem = (editor: typeof schema.BlockNoteEditor) => ({
     });
   },
   aliases: ["generateimage", "gi"],
-  group: "Tools",
+  group: "Output",
   icon: <CiImageOn size={18} />,
 });
 
@@ -100,6 +100,6 @@ export const textGenerationItem = (editor: typeof schema.BlockNoteEditor) => ({
     });
   },
   aliases: ["generate", "g"],
-  group: "Tools",
+  group: "Output",
   icon: <BsChatLeftText size={18} />,
 });

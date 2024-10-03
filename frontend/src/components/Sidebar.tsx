@@ -20,7 +20,7 @@ export default function Sidebar() {
   return (
     <div
       className={cn(
-        "min-h-screen flex flex-col items-center bg-gray-100 dark:bg-gray-900 transition-all duration-300 ease-in-out",
+        "min-h-screen flex flex-col items-center bg-white transition-all duration-300 ease-in-out border-r",
         isExpanded ? "w-32" : "w-16"
       )}
       onMouseEnter={() => setIsExpanded(true)}

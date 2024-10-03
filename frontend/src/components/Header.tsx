@@ -21,7 +21,7 @@ const Header = () => {
   };
 
   return (
-    <header className="w-full py-2 px-6 shadow-md">
+    <header className="w-full py-2 px-6 shadow-md border-b">
       <div className="container px-2 flex justify-between items-center">
         <h1 className="text-xl font-bold">NaturalAgents</h1>
 
