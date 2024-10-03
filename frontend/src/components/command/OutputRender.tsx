@@ -1,22 +1,27 @@
+import { RiArrowRightDoubleFill } from "react-icons/ri";
 import { Button } from "../ui/button";
+import { Separator } from "../ui/separator";
 
 const OutputRender = ({
   handleCloseSideView,
+  response,
 }: {
   handleCloseSideView: () => void;
+  response: string;
 }) => {
   return (
     <div className="flex flex-col h-full">
-      <div className="flex justify-start p-4">
-        <Button
-          className="bg-blue-600 text-white"
-          onClick={handleCloseSideView}
-        >
-          Output Action
+      <div className="flex items-center justify-between p-4">
+        <Button variant={"ghost"} onClick={handleCloseSideView}>
+          <RiArrowRightDoubleFill size={20} />
         </Button>
+        <h1 className="text-lg flex-1 text-center">Results</h1>
       </div>
+
+      <Separator />
+
       <div className="flex flex-1 items-center justify-center">
-        <div className="text-center">Output Section</div>
+        <div>{response}</div>
       </div>
     </div>
   );

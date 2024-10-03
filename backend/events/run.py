@@ -14,8 +14,8 @@ def processPayload(payload):
     responses = []
     for bubble in bubbles:
         response = run_api(bubble)
-    
-    responses.append(response)
+        responses.append(response)
+        
     return responses
 
 

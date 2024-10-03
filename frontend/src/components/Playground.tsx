@@ -8,18 +8,24 @@ import { Separator } from "@/components/ui/separator";
 import dynamic from "next/dynamic";
 
 import { ResizablePanel, ResizablePanelGroup } from "./ui/resizable";
+import { AiOutlineLoading } from "react-icons/ai"; // Importing a loading icon
 import OutputRender from "./command/OutputRender";
 import { EditorContext } from "./context/editorcontext";
 import { runDocument } from "./services/api";
 const Editor = dynamic(() => import("./command/CommandEditor"), { ssr: false });
 
 export default function PlaygroundPage() {
-  const [isSideViewOpen, setIsSideViewOpen] = useState(true); // State for managing side view visibility
+  const [isSideViewOpen, setIsSideViewOpen] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [response, setResponse] = useState("");
   const editorRef = useRef(null);
 
   const handleRunClick = async () => {
+    setLoading(true);
     setIsSideViewOpen(true); // Open side view when Run is clicked
-    await runDocument(editorRef);
+    const res = await runDocument(editorRef);
+    setResponse(res["message"]);
+    setLoading(false);
   };
 
   const handleCloseSideView = () => {
@@ -38,9 +44,16 @@ export default function PlaygroundPage() {
               <Button
                 className="bg-green-600 flex items-center space-x-2"
                 onClick={handleRunClick}
+                disabled={loading}
               >
-                <span>Run</span>
-                <CiLocationArrow1 className="h-4 w-4" />
+                {loading ? (
+                  <AiOutlineLoading className="animate-spin h-4 w-4" />
+                ) : (
+                  <>
+                    <span>Run</span>
+                    <CiLocationArrow1 className="h-4 w-4" />
+                  </>
+                )}
               </Button>
             </div>
           </div>
@@ -57,7 +70,10 @@ export default function PlaygroundPage() {
             {isSideViewOpen && (
               <div className="border border-gray-300 w-1/2 h-screen overflow-y-scroll	bg-white">
                 <ResizablePanel>
-                  <OutputRender handleCloseSideView={handleCloseSideView} />
+                  <OutputRender
+                    handleCloseSideView={handleCloseSideView}
+                    response={response}
+                  />
                 </ResizablePanel>
               </div>
             )}
