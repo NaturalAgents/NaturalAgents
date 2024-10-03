@@ -1,5 +1,13 @@
-import { BlockNoteEditor, PartialBlock } from "@blocknote/core";
-import { CiUser } from "react-icons/ci";
+import {
+  BlockNoteEditor,
+  PartialBlock,
+  insertOrUpdateBlock,
+} from "@blocknote/core";
+import { CiUser, CiImageOn, CiSearch } from "react-icons/ci";
+import { schema } from "./customschema/Schema";
+import { CgWebsite } from "react-icons/cg";
+
+import { BsChatLeftText } from "react-icons/bs";
 
 const InsertBlockCreate = (text: string, styles = {}) => {
   const block: PartialBlock = {
@@ -44,7 +52,7 @@ export const searchWebItem = (editor: BlockNoteEditor) => ({
   },
   aliases: ["searchweb", "sw"],
   group: "Tools",
-  icon: <CiUser size={18} />,
+  icon: <CiSearch size={18} />,
   subtext: "Search the web for information.",
 });
 
@@ -60,22 +68,38 @@ export const scrapeURLItem = (editor: BlockNoteEditor) => ({
   },
   aliases: ["scrapeurl", "su"],
   group: "Tools",
-  icon: <CiUser size={18} />,
+  icon: <CgWebsite size={18} />,
   subtext: "Scrape and format information from URL.",
 });
 
-export const imageGenerationItem = (editor: BlockNoteEditor) => ({
+export const imageGenerationItem = (editor: typeof schema.BlockNoteEditor) => ({
   title: "Generate image from description",
   onItemClick: () => {
-    const currentBlock = editor.getTextCursorPosition().block;
-    const block: PartialBlock = InsertBlockCreate("<command>:generate_image", {
-      bold: true,
-      textColor: "orange",
+    insertOrUpdateBlock(editor, {
+      type: "bubble",
+      props: {
+        text: "<command>:image_generation",
+        color: "green",
+      },
     });
-    editor.insertBlocks([block], currentBlock, "after");
   },
   aliases: ["generateimage", "gi"],
   group: "Tools",
-  icon: <CiUser size={18} />,
-  subtext: "Generate image based on description.",
+  icon: <CiImageOn size={18} />,
+});
+
+export const textGenerationItem = (editor: typeof schema.BlockNoteEditor) => ({
+  title: "Generate text",
+  onItemClick: () => {
+    insertOrUpdateBlock(editor, {
+      type: "bubble",
+      props: {
+        text: "<command>:generate",
+        color: "blue",
+      },
+    });
+  },
+  aliases: ["generate", "g"],
+  group: "Tools",
+  icon: <BsChatLeftText size={18} />,
 });

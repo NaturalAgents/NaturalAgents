@@ -13,7 +13,10 @@ import {
   searchWebItem,
   scrapeURLItem,
   imageGenerationItem,
+  textGenerationItem,
 } from "./CommandOptions";
+
+import { schema } from "./customschema/Schema";
 
 // List containing all default Slash Menu Items, as well as our custom one.
 const getCustomSlashMenuItems = (
@@ -23,19 +26,23 @@ const getCustomSlashMenuItems = (
   userInputItem(editor),
   searchWebItem(editor),
   scrapeURLItem(editor),
+  // @ts-ignore
   imageGenerationItem(editor),
+  // @ts-ignore
+  textGenerationItem(editor),
 ];
 
 const Editor = () => {
   // Creates a new editor instance.
-  const editor = useCreateBlockNote({});
+  const editor = useCreateBlockNote({ schema });
 
   return (
     <BlockNoteView editor={editor} slashMenu={false} theme={"light"}>
       <SuggestionMenuController
         triggerCharacter={"/"}
         getItems={async (query) =>
-          filterSuggestionItems(getCustomSlashMenuItems(editor), query)
+          //@ts-ignore
+          filterSuggestionItems([...getCustomSlashMenuItems(editor)], query)
         }
       />
     </BlockNoteView>
