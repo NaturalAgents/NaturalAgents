@@ -53,15 +53,20 @@ const Editor = () => {
           onChange={(e) => setTitle(e.target.value)}
           className="text-3xl font-bold focus:outline-none w-full placeholder-gray-400 mb-4"
         />
-        <BlockNoteView editor={editor} slashMenu={false} theme={"light"}>
-          <SuggestionMenuController
-            triggerCharacter={"/"}
-            getItems={async (query) =>
-              //@ts-ignore
-              filterSuggestionItems([...getCustomSlashMenuItems(editor)], query)
-            }
-          />
-        </BlockNoteView>
+        <div className="h-[450px] overflow-y-auto">
+          <BlockNoteView editor={editor} slashMenu={false} theme={"light"}>
+            <SuggestionMenuController
+              triggerCharacter={"/"}
+              getItems={async (query) =>
+                filterSuggestionItems(
+                  //@ts-ignore
+                  [...getCustomSlashMenuItems(editor)],
+                  query
+                )
+              }
+            />
+          </BlockNoteView>
+        </div>
       </div>
     </div>
   );

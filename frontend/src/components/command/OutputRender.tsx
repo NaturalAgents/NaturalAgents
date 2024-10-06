@@ -38,14 +38,15 @@ const OutputRender = ({
 
       <Separator />
 
-      <div className="flex flex-1 items-center justify-center">
-        {/* <div>{response}</div> */}
-        <BlockNoteView
-          editor={editor}
-          editable={false}
-          theme={"light"}
-          className="w-full h-full"
-        />
+      <div className="flex-1 overflow-auto">
+        <div className="flex items-center justify-center">
+          <BlockNoteView
+            editor={editor}
+            editable={false}
+            theme={"light"}
+            className="w-full h-full overflow-y-auto" // Fixed height with scrollable content
+          />
+        </div>
       </div>
     </div>
   );

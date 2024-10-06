@@ -2,7 +2,7 @@
 
 Easiest way to build agents in a notion-style editor.
 
-# Quick Start
+# ⚡ Quick Start
 
 ```
 docker-compose up --build
