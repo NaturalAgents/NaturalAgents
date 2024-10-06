@@ -25,8 +25,8 @@ const getCustomSlashMenuItems = (
   editor: BlockNoteEditor
 ): DefaultReactSuggestionItem[] => [
   userInputItem(editor),
-  searchWebItem(editor),
-  scrapeURLItem(editor),
+  // searchWebItem(editor),
+  // scrapeURLItem(editor),
   // @ts-ignore
   imageGenerationItem(editor),
   // @ts-ignore

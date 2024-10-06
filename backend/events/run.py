@@ -1,46 +1,94 @@
 import json
-from litellm import completion
-from dotenv import load_dotenv, dotenv_values
+from memory.memory import Memory
+from events.tools import generate_image, text_generate
 
-load_dotenv("/workspace/.env")
-config = dotenv_values("/workspace/.env")
-print(config)
+
+memory = Memory()
+
+ACTION_TYPES = {"<command>:generate", "<command>:image_generation"}
 
 
 def processPayload(payload):
     obj = json.loads(payload)    
-    bubbles = find_vertical_bubbles(obj)
+    bubbles_blocks = find_vertical_bubbles(obj)
 
-    responses = []
-    for bubble in bubbles:
-        response = run_api(bubble)
-        responses.append(response)
-        
-    return responses
+    print(bubbles_blocks)
+    
 
+    for block in bubbles_blocks:
+        memory.create_node_history()
+        for item in block:
+            memory.add_node_history(item[1], "user", item[0])
 
-def run_api(prompt, system=None, model="gpt-4o"):
-    messages = []
-    if system:
-        messages.append({"content": system, "role": "system"})
-    messages.append({ "content": prompt,"role": "user"})
+            chat_history = memory.latest_node_history()
 
-    response = completion(model=model, messages=messages)
-    return response['choices'][0]['message']['content']
+            if item[0] == "<command>:generate":
+                response = text_generate(item[1], chat_history)
+
+            elif item[0] == "<command>:image_generation":
+                response = generate_image(item[1])
+            else:
+                response = "command is not supported"
+
+            memory.add_node_history(response, "assistant", item[0])
+
+    return memory.get_all_histories()
 
 
 
 def find_vertical_bubbles(editor_content):
     vertical_bubbles = []
+
     def search_bubbles(content):
+        current_chain = []
+
         for item in content:
             if item['type'] == 'bubble':
-                vertical_bubbles.append(item["content"][0]["text"])
-            if 'children' in item and item['children']:
-                search_bubbles(item['children'])
+                current_chain.append((item["props"]["text"], item["content"][0]["text"]))
+                
+                if 'children' in item and item['children']:
+                    child_bubbles = search_bubbles(item['children'])
+                    current_chain.extend(child_bubbles)
 
-    search_bubbles(editor_content)
-    
+        return current_chain
+
+    for item in editor_content:
+        if item['type'] == 'bubble':
+            chain = [(item["props"]["text"], item["content"][0]["text"])]
+            if 'children' in item and item['children']:
+                child_bubbles = search_bubbles(item['children'])
+                chain.extend(child_bubbles)
+            vertical_bubbles.append(chain)
+
     return vertical_bubbles
 
 
+if __name__ == "__main__":
+    json_data = [
+    {
+        "id": "91d0f522-fa6b-4a8c-84aa-e5a8858394e5",
+        "type": "bubble",
+        "props": {"text": "<command>:image_generation", "color": "green"},
+        "content": [{"type": "text", "text": "Create an image of a fox breathing fire", "styles": {}}],
+        "children": [
+            {
+                "id": "cdd32dc7-afed-4cab-91e9-5af12af13a8c",
+                "type": "bubble",
+                "props": {"text": "<command>:generate", "color": "blue"},
+                "content": [{"type": "text", "text": "Write a description of the image above", "styles": {}}],
+                "children": []
+            }
+        ]
+    },
+    {
+        "id": "c458173e-1262-479b-ad48-5be21b74f092",
+        "type": "bubble",
+        "props": {"text": "<command>:another_action", "color": "red"},
+        "content": [{"type": "text", "text": "Perform another action", "styles": {}}],
+        "children": []
+    }
+]
+
+
+    bubbles = find_vertical_bubbles(json_data)
+    print(bubbles)

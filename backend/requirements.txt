@@ -2,3 +2,4 @@ fastapi
 uvicorn
 litellm
 python-dotenv
+requests

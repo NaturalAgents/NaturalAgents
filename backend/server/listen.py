@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from events.run import processPayload
@@ -30,6 +30,34 @@ def receive_data(data: DataModel):
     response = processPayload(data.content)
 
     return {"message": json.dumps(response)}
+
+
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    """
+        {action: "initialize"} # setup workspace if it doesn't exist
+        {action: "read", file: "/workspace/useragents/filename.txt"}
+        {action: "read", file: "/workspace/useragents/filename.txt"}
+        {action: "run"}
+        {action: ""}
+    
+    """
+    await websocket.accept()
+    while True:
+        data = await websocket.receive_text()
+        data = json.loads(data)
+        if data["action"] == "run":
+            response = processPayload(data.content)
+            await websocket.send_text({"message": json.dumps(response)})
+
+        else:
+            await websocket.send_text({"message": "action not supported"})
+        
+
+
+
+        
+
 
 
 app.add_middleware(
