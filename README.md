@@ -6,7 +6,9 @@
 
 ## 😎 Demo
 
-<video src="https://github.com/NaturalAgents/NaturalAgents/blob/main/assets/NaturalAgents%20Demo.mp4" controls title="NaturalAgents Demo"></video>
+https://github.com/user-attachments/assets/4a2c5c10-e2c0-4b2f-b979-c5a07d42471d
+
+
 
 ## ⚡ Quick Start
 
