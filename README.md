@@ -4,6 +4,10 @@
     <div align="center">Easiest way to build agents in a notion-style editor.</div>
 </div>
 
+## 😎 Demo
+
+<video src="assets/NaturalAgents%20Demo.mp4" controls title="NaturalAgents Demo"></video>
+
 ## ⚡ Quick Start
 
 ```

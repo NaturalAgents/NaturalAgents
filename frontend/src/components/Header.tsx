@@ -23,7 +23,10 @@ const Header = () => {
   return (
     <header className="w-full py-2 px-6 shadow-md border-b">
       <div className="container px-2 flex justify-between items-center">
-        <h1 className="text-xl font-bold">NaturalAgents</h1>
+        <div className="flex items-center space-x-2">
+          <img src="/static/images/logo.svg" alt="Logo" className="h-8 w-8" />
+          <h1 className="text-xl font-bold">NaturalAgents</h1>
+        </div>
 
         {/* Move Settings Icon to the Right */}
         <div className="ml-12">
