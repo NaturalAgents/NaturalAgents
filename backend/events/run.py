@@ -7,32 +7,32 @@ memory = Memory()
 
 ACTION_TYPES = {"<command>:generate", "<command>:image_generation"}
 
-
+# TODO: handle the history with image params
 def processPayload(payload):
     obj = json.loads(payload)    
     bubbles_blocks = find_vertical_bubbles(obj)
 
-    print(bubbles_blocks)
-    
-
     for block in bubbles_blocks:
         memory.create_node_history()
         for item in block:
+            image = False
             memory.add_node_history(item[1], "user", item[0])
 
             chat_history = memory.latest_node_history()
 
             if item[0] == "<command>:generate":
-                response = text_generate(item[1], chat_history)
+                response = text_generate(item[1], history=chat_history)
 
             elif item[0] == "<command>:image_generation":
                 response = generate_image(item[1])
+                image = True
             else:
                 response = "command is not supported"
 
-            memory.add_node_history(response, "assistant", item[0])
+            memory.add_node_history(response, "assistant", item[0], image=image)
 
-    return memory.get_all_histories()
+    output = memory.markdown_response()
+    return output
 
 
 

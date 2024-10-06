@@ -9,10 +9,13 @@ import dynamic from "next/dynamic";
 
 import { ResizablePanel, ResizablePanelGroup } from "./ui/resizable";
 import { AiOutlineLoading } from "react-icons/ai"; // Importing a loading icon
-import OutputRender from "./command/OutputRender";
+// import OutputRender from "./command/OutputRender";
 import { EditorContext } from "./context/editorcontext";
 import { runDocument } from "./services/api";
 const Editor = dynamic(() => import("./command/CommandEditor"), { ssr: false });
+const OutputRender = dynamic(() => import("./command/OutputRender"), {
+  ssr: false,
+});
 
 export default function PlaygroundPage() {
   const [isSideViewOpen, setIsSideViewOpen] = useState(true);
@@ -25,6 +28,7 @@ export default function PlaygroundPage() {
     setIsSideViewOpen(true); // Open side view when Run is clicked
     const res = await runDocument(editorRef);
     setResponse(res["message"]);
+    console.log("incoming response", res["message"]);
     setLoading(false);
   };
 

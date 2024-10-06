@@ -1,6 +1,11 @@
+"use client";
+
 import { RiArrowRightDoubleFill } from "react-icons/ri";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
+import { BlockNoteView } from "@blocknote/mantine";
+import { useCreateBlockNote } from "@blocknote/react";
+import { useEffect } from "react";
 
 const OutputRender = ({
   handleCloseSideView,
@@ -9,6 +14,19 @@ const OutputRender = ({
   handleCloseSideView: () => void;
   response: string;
 }) => {
+  const editor = useCreateBlockNote();
+
+  // const image = `# My output\n\n![my image](https://letsenhance.io/static/8f5e523ee6b2479e26ecc91b9c25261e/1015f/MainAfter.jpg)`;
+
+  const convertOutputToMarkdown = async () => {
+    const blocks = await editor.tryParseMarkdownToBlocks(response);
+    editor.replaceBlocks(editor.document, blocks);
+  };
+
+  useEffect(() => {
+    convertOutputToMarkdown();
+  }, [response]);
+
   return (
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-between p-4">
@@ -21,7 +39,13 @@ const OutputRender = ({
       <Separator />
 
       <div className="flex flex-1 items-center justify-center">
-        <div>{response}</div>
+        {/* <div>{response}</div> */}
+        <BlockNoteView
+          editor={editor}
+          editable={false}
+          theme={"light"}
+          className="w-full h-full"
+        />
       </div>
     </div>
   );

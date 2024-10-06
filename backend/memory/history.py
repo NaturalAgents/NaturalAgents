@@ -3,8 +3,24 @@ class ShortTermMemory:
         self.history = []
 
 
-    def queue_history(self, content, role, command):
-        self.history.append({"content": content, "role": role, "command": command})
+    def queue_history(self, content, role, command, image=False):
+        historical_content = []
+        
+        if image:
+            content_info = {"type": "image_url",
+                            "image_url": {
+                                "url": content
+                                }
+                            }
+        else:
+            content_info = {
+                "type": "text",
+                "text": content
+            }
+        historical_content.append(content_info)
+
+
+        self.history.append({"content": historical_content, "role": role, "command": command})
 
 
     def get_history(self):

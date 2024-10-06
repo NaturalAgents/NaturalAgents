@@ -29,7 +29,7 @@ def receive_data(data: DataModel):
     # Process the received data
     response = processPayload(data.content)
 
-    return {"message": json.dumps(response)}
+    return {"message": response}
 
 
 @app.websocket("/ws")
