@@ -14,6 +14,7 @@ import {
   scrapeURLItem,
   imageGenerationItem,
   textGenerationItem,
+  summarizeItem,
 } from "./CommandOptions";
 
 import { schema } from "./customschema/Schema";
@@ -32,6 +33,8 @@ const getCustomSlashMenuItems = (
   // @ts-ignore
   textGenerationItem(editor),
   // ...getDefaultReactSlashMenuItems(editor),
+  // @ts-ignore
+  summarizeItem(editor),
 ];
 
 const Editor = () => {

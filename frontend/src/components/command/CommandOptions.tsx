@@ -8,6 +8,7 @@ import { schema } from "./customschema/Schema";
 import { CgWebsite } from "react-icons/cg";
 
 import { BsChatLeftText } from "react-icons/bs";
+import { MdOutlineSummarize } from "react-icons/md";
 
 const InsertBlockCreate = (text: string, styles = {}) => {
   const block: PartialBlock = {
@@ -102,4 +103,19 @@ export const textGenerationItem = (editor: typeof schema.BlockNoteEditor) => ({
   aliases: ["generate", "g"],
   group: "Output",
   icon: <BsChatLeftText size={18} />,
+});
+
+export const summarizeItem = (editor: typeof schema.BlockNoteEditor) => ({
+  title: "Summarize",
+  onItemClick: () => {
+    insertOrUpdateBlock(editor, {
+      type: "noparam",
+      props: {
+        text: "<command>:summarize",
+      },
+    });
+  },
+  aliases: ["summarize", "su", "summary"],
+  group: "Output",
+  icon: <MdOutlineSummarize size={18} />,
 });
