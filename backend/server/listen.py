@@ -120,11 +120,9 @@ def handle_file(data: HandleFile):
                 while os.path.exists(os.path.join(base_path, f"{base_name}({index}){ext}")):
                     index += 1
                 file_path = os.path.join(base_path, f"{base_name}({index}){ext}")
-
-
-            # Create the file and write content
-            with open(file_path, "w") as f:
-                f.write(data.content)
+                
+            with open(file_path, 'w') as _:
+                pass
             
             return {"message": "File created successfully"}
         except Exception as e:

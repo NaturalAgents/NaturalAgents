@@ -14,4 +14,4 @@ class HandleFile(BaseModel):
     path: str
     name: str
     action: str
-    content: str = ""
+    new_name : str = ""
