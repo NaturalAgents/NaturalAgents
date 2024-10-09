@@ -1,61 +1,100 @@
-import { useState } from "react";
-import { CiFileOn, CiFolderOn } from "react-icons/ci";
+import { useEffect, useState } from "react";
 import { VscNewFile, VscNewFolder } from "react-icons/vsc";
+import { AiOutlineArrowLeft } from "react-icons/ai";
+import { fetchDirectoryTree } from "../services/api";
+import FileTree from "./FileTree";
+import NewItemInput from "./NewItemInput";
+
+export interface FileEntry {
+  name: string;
+  path: string;
+  is_file: boolean;
+  is_directory: boolean;
+}
+
+export enum FILETYPE {
+  FILE = "file",
+  DIR = "dir",
+}
 
 const FileExplorer = () => {
-  const [directories, setDirectories] = useState([
-    { type: "folder", name: "Folder 1", children: [] },
+  // format {name: "test", path: ".", is_file: true, is_directory: false}
+  const [directoryTree, setDirectoryTree] = useState<FileEntry[]>([
+    { name: "test", path: ".", is_file: true, is_directory: false },
   ]);
+  const [currentPath, setCurrentPath] = useState<string>(".");
+  const [isCreating, setIsCreating] = useState<{
+    state: boolean;
+    type: FILETYPE;
+  }>({ state: false, type: FILETYPE.FILE });
 
-  // Function to create a new file
-  // const createFile = () => {
-  //   setDirectories((prev) => [
-  //     ...prev,
-  //     { type: "file", name: `File ${prev.length + 1}` },
-  //   ]);
-  // };
+  const getDirectoryTree = async () => {
+    const tree = await fetchDirectoryTree(currentPath);
+    if (tree) setDirectoryTree(tree);
+  };
 
-  // Function to create a new folder
-  const createFolder = () => {
-    setDirectories((prev) => [
-      ...prev,
-      { type: "folder", name: `Folder ${prev.length + 1}`, children: [] },
-    ]);
+  useEffect(() => {
+    getDirectoryTree();
+  }, [currentPath]);
+
+  const navigateTo = (path: string) => {
+    setCurrentPath(path);
+  };
+
+  const goBack = () => {
+    if (currentPath !== ".") {
+      const parentPath = currentPath.split("/").slice(0, -1).join("/") || ".";
+      setCurrentPath(parentPath);
+    }
+  };
+
+  const handleCreate = (type: FILETYPE) => {
+    setIsCreating({ state: true, type });
   };
 
   return (
     <div className="min-h-screen w-48 bg-white border-r border-gray-300 flex flex-col items-start py-4">
-      <div className="px-4 flex items-center space-x-2">
-        {/* Folder and File icons */}
+      <div className="px-4 flex items-center space-x-2 mb-4">
         <VscNewFile
           className="cursor-pointer text-gray-600"
           size={20}
-          // onClick={createFile}
+          onClick={() => handleCreate(FILETYPE.FILE)}
         />
         <VscNewFolder
           className="cursor-pointer text-gray-600"
           size={20}
-          onClick={createFolder}
+          onClick={() => handleCreate(FILETYPE.DIR)}
         />
       </div>
 
-      {/* Render Directories */}
-      <div className="px-4 mt-6 w-full">
+      <div className="px-4 w-full">
         <h3 className="text-lg font-semibold">Files</h3>
+        {currentPath !== "." && (
+          <button
+            className="flex items-center space-x-2 text-gray-600 mb-4 mt-4"
+            onClick={goBack}
+          >
+            <AiOutlineArrowLeft size={20} />
+            <span>Back</span>
+          </button>
+        )}
+
         <ul className="mt-4">
-          {directories.map((dir, index) => (
-            <li
-              key={index}
-              className="text-sm text-gray-700 mb-2 flex items-center space-x-2"
-            >
-              {dir.type === "file" ? (
-                <CiFileOn className="text-gray-600" />
-              ) : (
-                <CiFolderOn className="text-gray-600" />
-              )}
-              <span>{dir.name}</span>
-            </li>
-          ))}
+          {isCreating.state && (
+            <NewItemInput
+              isCreating={isCreating}
+              setIsCreating={setIsCreating}
+              getDirectoryTree={getDirectoryTree}
+              currentPath={currentPath}
+            />
+          )}
+
+          <FileTree
+            directoryTree={directoryTree}
+            navigateTo={navigateTo}
+            getDirectoryTree={getDirectoryTree}
+            currentPath={currentPath}
+          />
         </ul>
       </div>
     </div>
