@@ -25,3 +25,5 @@ tsconfig.tsbuildinfo
 
 # User storage
 **/workspace/
+
+**/output/

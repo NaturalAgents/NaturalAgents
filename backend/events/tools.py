@@ -1,3 +1,4 @@
+from events.PROMPTS import SUMMARY_PROMPT
 from litellm import image_generation
 from litellm import completion
 from dotenv import load_dotenv
@@ -34,6 +35,7 @@ def text_generate(prompt, system=None, model="gpt-4o", history=[]):
     if len(msg_history) == 1:
         messages.append(msg_history[0])
     
+    # replace this with "user" only if the context contains an image output
     if len(msg_history) > 1:
         context = msg_history[-2].copy()
         if context["role"] == "assistant":
@@ -44,8 +46,19 @@ def text_generate(prompt, system=None, model="gpt-4o", history=[]):
  
     print("model inputs", messages)
     
+    # Newest instruction prompt is already inserted into history
     # messages.append({ "content": [{"type": "text", "text": prompt}],"role": "user"})
 
     response = completion(model=model, messages=messages)
     return response['choices'][0]['message']['content']
 
+
+
+def summarize(requirements=None, model="gpt-4o", history=[]):
+    msg_history = history.copy()
+    # msg_history.append({"content": SUMMARY_PROMPT, "role": "user"})
+    response = completion(model=model, messages=msg_history)
+    return response['choices'][0]['message']['content']
+
+    
+    
