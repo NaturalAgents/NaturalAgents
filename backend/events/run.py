@@ -18,23 +18,19 @@ def processPayload(payload):
             image = False
             
 
-
+            chat_history = memory.latest_node_history()
             if item[0] == "<command>:generate":
-                memory.add_node_history(item[1], "user", item[0])
-                chat_history = memory.latest_node_history()
-
                 response = text_generate(item[1], history=chat_history)
+                memory.add_node_history(item[1], "user", item[0])
 
             elif item[0] == "<command>:image_generation":
-                memory.add_node_history(item[1], "user", item[0])
-                chat_history = memory.latest_node_history()
                 response = generate_image(item[1])
+                memory.add_node_history(item[1], "user", item[0])
                 image = True
 
             elif item[0] == "<command>:summarize":
+                response = summarize(history=chat_history)
                 memory.add_node_history(SUMMARY_PROMPT, "user", item[0])
-                chat_history = memory.latest_node_history()
-                response = "\n\n**Summary**\n\n" + summarize(history=chat_history)
 
             else:
                 response = "command is not supported"
