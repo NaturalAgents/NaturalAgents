@@ -1,5 +1,7 @@
 
 from pydantic import BaseModel
+from typing import Optional
+
 
 class DataModel(BaseModel):
     content: str  # Adjust this field based on your expected data structure
@@ -16,7 +18,7 @@ class HandleFile(BaseModel):
     action: str
     new_name : str = ""
 
-class FileReadWrite(BaseModel):
+class FileWrite(BaseModel):
     path: str
-    name: str
-    text: str = ""
+    title: str
+    text: str

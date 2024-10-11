@@ -1,4 +1,4 @@
-from server.modeltypes import DataModel, HandleFolder, HandleFile, FileReadWrite
+from server.modeltypes import DataModel, HandleFolder, HandleFile, FileWrite
 from fastapi import FastAPI, HTTPException, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 from events.run import processPayload
@@ -110,6 +110,8 @@ def handle_folder(data: HandleFolder):
 def handle_file(data: HandleFile):
     base_path = os.path.join("/workspace/useragents", data.path)
 
+    print(data)
+
     if data.action == "create":
         try:
             file_path = os.path.join(base_path, data.name)
@@ -171,9 +173,8 @@ def handle_file(data: HandleFile):
 
 
 @app.get("/api/retrieve-file")
-def retrieve_file(data: FileReadWrite):
-    base_path = os.path.join("/workspace/useragents", data.path)
-    file_path = os.path.join(base_path, data.name)
+def retrieve_file(path: str):
+    file_path = os.path.join("/workspace/useragents", path)
     if os.path.exists(file_path):
         with open(file_path, 'r') as file:
             text = file.read()
@@ -184,12 +185,12 @@ def retrieve_file(data: FileReadWrite):
 
 
 @app.post("/api/save-file")
-def save_file(data: FileReadWrite):
-    base_path = os.path.join("/workspace/useragents", data.path)
-    file_path = os.path.join(base_path, data.name)
+def save_file(data: FileWrite):
+    file_path = os.path.join("/workspace/useragents", data.path)
     if os.path.exists(file_path):
+        text = json.dumps({"title": data.title, "text": data.text})
         with open(file_path, 'w') as file:
-            file.write(data.text)
+            file.write(text)
             return {"message": "success"}
         
     raise HTTPException(status_code=400, detail="File does not exist")

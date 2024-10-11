@@ -1,6 +1,10 @@
 "use client";
 
-import { BlockNoteEditor, filterSuggestionItems } from "@blocknote/core";
+import {
+  BlockNoteEditor,
+  PartialBlock,
+  filterSuggestionItems,
+} from "@blocknote/core";
 import {
   DefaultReactSuggestionItem,
   SuggestionMenuController,
@@ -18,9 +22,10 @@ import {
 } from "./CommandOptions";
 
 import { schema } from "./customschema/Schema";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useEditor } from "../context/editorcontext";
 import { FileEntry } from "../file-explorer/FileExplorer";
+import { readFile } from "../services/api";
 
 // List containing all default Slash Menu Items, as well as our custom one.
 const getCustomSlashMenuItems = (
@@ -40,15 +45,28 @@ const getCustomSlashMenuItems = (
 
 const Editor = ({ selectedFile }: { selectedFile: FileEntry | null }) => {
   // Creates a new editor instance.
+  const [initialContent, setInitialContent] = useState<PartialBlock[] | null>(
+    null
+  );
 
-  const editor = useCreateBlockNote({ schema });
+  const editor = useCreateBlockNote({
+    schema,
+  });
+
   const [title, setTitle] = useState(""); // State for the title
 
   const editorRef = useEditor();
   editorRef.current = editor;
 
+  const read = async () => {
+    if (selectedFile) {
+      const res = await readFile(selectedFile.path);
+      console.log("file details", res);
+    }
+  };
+
   useEffect(() => {
-    console.log("selected", selectedFile);
+    read();
   }, [selectedFile]);
 
   return (
@@ -63,18 +81,22 @@ const Editor = ({ selectedFile }: { selectedFile: FileEntry | null }) => {
           className="text-3xl font-bold focus:outline-none w-full placeholder-gray-400 mb-4"
         />
         <div className="h-[450px] overflow-y-auto">
-          <BlockNoteView editor={editor} slashMenu={false} theme={"light"}>
-            <SuggestionMenuController
-              triggerCharacter={"/"}
-              getItems={async (query) =>
-                filterSuggestionItems(
-                  //@ts-ignore
-                  [...getCustomSlashMenuItems(editor)],
-                  query
-                )
-              }
-            />
-          </BlockNoteView>
+          {editor ? (
+            <BlockNoteView editor={editor} slashMenu={false} theme={"light"}>
+              <SuggestionMenuController
+                triggerCharacter={"/"}
+                getItems={async (query) =>
+                  filterSuggestionItems(
+                    //@ts-ignore
+                    [...getCustomSlashMenuItems(editor)],
+                    query
+                  )
+                }
+              />
+            </BlockNoteView>
+          ) : (
+            "Loading"
+          )}
         </div>
       </div>
     </div>

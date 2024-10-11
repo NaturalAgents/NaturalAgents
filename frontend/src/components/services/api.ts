@@ -59,23 +59,22 @@ export const handleFile = async (
   });
 };
 
-export const readWriteFile = async (
+export const readFile = async (path: string) => {
+  const response = await fetch(`/api/retrieve-file?path=${path}`);
+  if (response.ok) {
+    const res = await response.json();
+    return res.data;
+  }
+};
+
+export const writeFile = async (
   path: string,
-  name: string,
-  action: string,
+  title: string,
   text: string = ""
 ) => {
-  if (action == "read") {
-    await fetch("/api/retrieve-file", {
-      method: "GET",
-    });
-  }
-
-  if (action == "write") {
-    await fetch("/api/handle-file", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ path, name, text }),
-    });
-  }
+  await fetch("/api/save-file", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ path, title, text }),
+  });
 };
