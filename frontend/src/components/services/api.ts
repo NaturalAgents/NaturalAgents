@@ -58,3 +58,24 @@ export const handleFile = async (
     body: JSON.stringify({ path, name, action, new_name }),
   });
 };
+
+export const readWriteFile = async (
+  path: string,
+  name: string,
+  action: string,
+  text: string = ""
+) => {
+  if (action == "read") {
+    await fetch("/api/retrieve-file", {
+      method: "GET",
+    });
+  }
+
+  if (action == "write") {
+    await fetch("/api/handle-file", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ path, name, text }),
+    });
+  }
+};

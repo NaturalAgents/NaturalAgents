@@ -1,4 +1,4 @@
-from server.modeltypes import DataModel, HandleFolder, HandleFile
+from server.modeltypes import DataModel, HandleFolder, HandleFile, FileReadWrite
 from fastapi import FastAPI, HTTPException, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 from events.run import processPayload
@@ -170,6 +170,31 @@ def handle_file(data: HandleFile):
     raise HTTPException(status_code=400, detail="Action is not supported")
 
 
+@app.get("/api/retrieve-file")
+def retrieve_file(data: FileReadWrite):
+    base_path = os.path.join("/workspace/useragents", data.path)
+    file_path = os.path.join(base_path, data.name)
+    if os.path.exists(file_path):
+        with open(file_path, 'r') as file:
+            text = file.read()
+        return {"data": text}
+    
+    raise HTTPException(status_code=400, detail="File does not exist")
+
+
+
+@app.post("/api/save-file")
+def save_file(data: FileReadWrite):
+    base_path = os.path.join("/workspace/useragents", data.path)
+    file_path = os.path.join(base_path, data.name)
+    if os.path.exists(file_path):
+        with open(file_path, 'w') as file:
+            file.write(data.text)
+            return {"message": "success"}
+        
+    raise HTTPException(status_code=400, detail="File does not exist")
+
+
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     """
@@ -181,15 +206,19 @@ async def websocket_endpoint(websocket: WebSocket):
     
     """
     await websocket.accept()
+    print("connection")
+    # print("room_id", room_id)
     while True:
         data = await websocket.receive_text()
-        data = json.loads(data)
-        if data["action"] == "run":
-            response = processPayload(data.content)
-            await websocket.send_text({"message": json.dumps(response)})
+        print(data)
+        await websocket.send_text(f"Message text was: {data}")
 
-        else:
-            await websocket.send_text({"message": "action not supported"})
+        # if data["action"] == "run":
+        #     response = processPayload(data.content)
+        #     await websocket.send_text({"message": json.dumps(response)})
+
+        # else:
+        #     await websocket.send_text({"message": "action not supported"})
         
 
 

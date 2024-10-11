@@ -15,3 +15,8 @@ class HandleFile(BaseModel):
     name: str
     action: str
     new_name : str = ""
+
+class FileReadWrite(BaseModel):
+    path: str
+    name: str
+    text: str = ""
