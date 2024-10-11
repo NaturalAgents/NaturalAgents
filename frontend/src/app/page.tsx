@@ -1,8 +1,13 @@
 // pages/index.js
-import Layout from "../components/Playground";
+import { EditorProvider } from "@/components/context/editorcontext";
+import PlaygroundPage from "../components/Playground";
 
 const Home = () => {
-  return <Layout />;
+  return (
+    <EditorProvider>
+      <PlaygroundPage />
+    </EditorProvider>
+  );
 };
 
 export default Home;

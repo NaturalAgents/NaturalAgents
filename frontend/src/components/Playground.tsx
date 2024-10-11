@@ -10,7 +10,11 @@ import dynamic from "next/dynamic";
 import { ResizablePanel, ResizablePanelGroup } from "./ui/resizable";
 import { AiOutlineLoading } from "react-icons/ai"; // Importing a loading icon
 // import OutputRender from "./command/OutputRender";
-import { EditorContext } from "./context/editorcontext";
+import {
+  EditorContext,
+  EditorProvider,
+  useEditor,
+} from "./context/editorcontext";
 import { runDocument } from "./services/api";
 import FileExplorer, { FileEntry } from "./file-explorer/FileExplorer";
 const Editor = dynamic(() => import("./command/CommandEditor"), { ssr: false });
@@ -23,7 +27,7 @@ export default function PlaygroundPage() {
   const [selectedFile, setSelectedFile] = useState<FileEntry | null>(null);
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState("");
-  const editorRef = useRef(null);
+  const { editorRef } = useEditor();
 
   const handleRunClick = async () => {
     setLoading(true);
@@ -70,9 +74,7 @@ export default function PlaygroundPage() {
 
           <ResizablePanelGroup direction="horizontal">
             <ResizablePanel>
-              <EditorContext.Provider value={editorRef}>
-                <Editor selectedFile={selectedFile} />
-              </EditorContext.Provider>
+              <Editor selectedFile={selectedFile} />
             </ResizablePanel>
 
             {isSideViewOpen && (

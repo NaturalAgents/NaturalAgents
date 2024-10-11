@@ -1,6 +1,9 @@
-import { EditorContextType } from "../context/editorcontext";
+import { MutableRefObject } from "react";
+import { schema } from "../command/customschema/Schema";
 
-export const runDocument = async (editorRef: EditorContextType) => {
+export const runDocument = async (
+  editorRef: MutableRefObject<typeof schema.BlockNoteEditor | null>
+) => {
   const data = editorRef.current?.document || [];
   console.log(JSON.stringify(data));
 

@@ -53,9 +53,7 @@ const Editor = ({ selectedFile }: { selectedFile: FileEntry | null }) => {
     schema,
   });
 
-  const [title, setTitle] = useState(""); // State for the title
-
-  const editorRef = useEditor();
+  const { editorRef, setTitle, title } = useEditor();
   editorRef.current = editor;
 
   const read = async () => {
