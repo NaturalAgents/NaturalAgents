@@ -1,9 +1,11 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 import { CiLocationArrow1 } from "react-icons/ci";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { FaRegSave } from "react-icons/fa";
 
 import dynamic from "next/dynamic";
 
@@ -15,7 +17,7 @@ import {
   EditorProvider,
   useEditor,
 } from "./context/editorcontext";
-import { runDocument } from "./services/api";
+import { runDocument, writeFile } from "./services/api";
 import FileExplorer, { FileEntry } from "./file-explorer/FileExplorer";
 const Editor = dynamic(() => import("./command/CommandEditor"), { ssr: false });
 const OutputRender = dynamic(() => import("./command/OutputRender"), {
@@ -27,7 +29,8 @@ export default function PlaygroundPage() {
   const [selectedFile, setSelectedFile] = useState<FileEntry | null>(null);
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState("");
-  const { editorRef } = useEditor();
+  const { editorRef, title } = useEditor();
+  const { toast } = useToast();
 
   const handleRunClick = async () => {
     setLoading(true);
@@ -42,6 +45,28 @@ export default function PlaygroundPage() {
     setIsSideViewOpen(false); // Close side view
   };
 
+  const handleSaveFile = async () => {
+    if (selectedFile) {
+      const text = editorRef?.current?.document || [];
+      const res = await writeFile(
+        selectedFile.path,
+        title,
+        JSON.stringify(text)
+      );
+      if (res) {
+        toast({
+          title: "Save status",
+          description: "Successful!",
+        });
+      } else {
+        toast({
+          title: "Save status",
+          description: "Failed due to unexpected error :(",
+        });
+      }
+    }
+  };
+
   return (
     <div className="flex h-screen bg-gray-100">
       <FileExplorer setSelectedFile={setSelectedFile} />
@@ -52,7 +77,14 @@ export default function PlaygroundPage() {
             <h2 className="text-md font-semibold pl-8">Playground</h2>
             {/* Run button at top-right */}
             <div className="flex space-x-4 justify-end pr-4">
-              <Button variant={"outline"}> Save File </Button>
+              <Button
+                variant={"outline"}
+                className="flex items-center space-x-2"
+                onClick={handleSaveFile}
+              >
+                Save File
+                <FaRegSave className="h-4 w-4" />
+              </Button>
               <Button
                 className="bg-green-600 flex items-center space-x-2"
                 onClick={handleRunClick}

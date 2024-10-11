@@ -75,9 +75,14 @@ export const writeFile = async (
   title: string,
   text: string = ""
 ) => {
-  await fetch("/api/save-file", {
+  const response = await fetch("/api/save-file", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ path, title, text }),
   });
+
+  if (response.ok) {
+    return true;
+  }
+  false;
 };
