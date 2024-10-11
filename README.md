@@ -40,9 +40,9 @@ docker-compose up --build
 
 NaturalAgents is a community-driven project, and we welcome contributions from everyone! There are many ways to be involved:
 
-1. Code contributions - start with existing issues or form new ones; create pull requests to contribute
-2. Usability research/design - from organization to UI/UX, we want this to as usable and inuitive as possible
-3. Feedback and testing - let us know what is working, and what you'd like to see
+1. Code contributions - help us develop new macros, frontend interfaces, and backend infrastructure for executing agentic workflows
+2. Usability research/design - ideate best possible features and UI/UX organizations with us (we want this software to be as usable/inuitive as possible)
+3. Feedback and testing - let us know what is working well, what could be improved, and what you'd like to see
 
 ## 💪 Motivation
 
