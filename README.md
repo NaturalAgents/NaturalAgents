@@ -36,6 +36,14 @@ OPENAI_API_KEY=<your_api_key>
 docker-compose up --build
 ```
 
+## How to Contribute
+
+NaturalAgents is a community-driven project, and we welcome contributions from everyone! There are many ways to be involved:
+
+1. Code contributions - start with existing issues or form new ones; create pull requests to contribute
+2. Usability research/design - from organization to UI/UX, we want this to as usable and inuitive as possible
+3. Feedback and testing - let us know what is working, and what you'd like to see
+
 ## 💪 Motivation
 
 We're making it easy for anyone to build Agents and custom workflows with AI using just plain english. We aim to democratize the power of agents to everyone
