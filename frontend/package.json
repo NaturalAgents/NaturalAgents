@@ -46,7 +46,9 @@
     "shadcn": "^2.1.0",
     "tailwind-merge": "^2.5.2",
     "tailwindcss-animate": "^1.0.7",
-    "vaul": "^1.0.0"
+    "vaul": "^1.0.0",
+    "y-websocket": "^2.0.4",
+    "yjs": "^13.6.19"
   },
   "devDependencies": {
     "@types/node": "^20",

@@ -17,7 +17,11 @@ export enum FILETYPE {
   DIR = "dir",
 }
 
-const FileExplorer = () => {
+const FileExplorer = ({
+  setSelectedFile,
+}: {
+  setSelectedFile: (fileentry: FileEntry) => void;
+}) => {
   // format {name: "test", path: ".", is_file: true, is_directory: false}
   const [directoryTree, setDirectoryTree] = useState<FileEntry[]>([
     { name: "test", path: ".", is_file: true, is_directory: false },
@@ -94,6 +98,7 @@ const FileExplorer = () => {
             navigateTo={navigateTo}
             getDirectoryTree={getDirectoryTree}
             currentPath={currentPath}
+            setSelectedFile={setSelectedFile}
           />
         </ul>
       </div>

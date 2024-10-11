@@ -18,8 +18,9 @@ import {
 } from "./CommandOptions";
 
 import { schema } from "./customschema/Schema";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useEditor } from "../context/editorcontext";
+import { FileEntry } from "../file-explorer/FileExplorer";
 
 // List containing all default Slash Menu Items, as well as our custom one.
 const getCustomSlashMenuItems = (
@@ -37,13 +38,18 @@ const getCustomSlashMenuItems = (
   summarizeItem(editor),
 ];
 
-const Editor = () => {
+const Editor = ({ selectedFile }: { selectedFile: FileEntry | null }) => {
   // Creates a new editor instance.
+
   const editor = useCreateBlockNote({ schema });
   const [title, setTitle] = useState(""); // State for the title
 
   const editorRef = useEditor();
   editorRef.current = editor;
+
+  useEffect(() => {
+    console.log("selected", selectedFile);
+  }, [selectedFile]);
 
   return (
     <div className="flex flex-1 items-center px-4 py-6 w-full">

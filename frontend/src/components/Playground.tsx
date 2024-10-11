@@ -12,7 +12,7 @@ import { AiOutlineLoading } from "react-icons/ai"; // Importing a loading icon
 // import OutputRender from "./command/OutputRender";
 import { EditorContext } from "./context/editorcontext";
 import { runDocument } from "./services/api";
-import FileExplorer from "./file-explorer/FileExplorer";
+import FileExplorer, { FileEntry } from "./file-explorer/FileExplorer";
 const Editor = dynamic(() => import("./command/CommandEditor"), { ssr: false });
 const OutputRender = dynamic(() => import("./command/OutputRender"), {
   ssr: false,
@@ -20,6 +20,7 @@ const OutputRender = dynamic(() => import("./command/OutputRender"), {
 
 export default function PlaygroundPage() {
   const [isSideViewOpen, setIsSideViewOpen] = useState(true);
+  const [selectedFile, setSelectedFile] = useState<FileEntry | null>(null);
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState("");
   const editorRef = useRef(null);
@@ -39,7 +40,7 @@ export default function PlaygroundPage() {
 
   return (
     <div className="flex h-screen bg-gray-100">
-      <FileExplorer />
+      <FileExplorer setSelectedFile={setSelectedFile} />
 
       <div className="flex-1 h-full">
         <div className="hidden h-full flex-col md:flex ">
@@ -47,6 +48,7 @@ export default function PlaygroundPage() {
             <h2 className="text-md font-semibold pl-8">Playground</h2>
             {/* Run button at top-right */}
             <div className="flex space-x-4 justify-end pr-4">
+              <Button variant={"outline"}> Save File </Button>
               <Button
                 className="bg-green-600 flex items-center space-x-2"
                 onClick={handleRunClick}
@@ -69,7 +71,7 @@ export default function PlaygroundPage() {
           <ResizablePanelGroup direction="horizontal">
             <ResizablePanel>
               <EditorContext.Provider value={editorRef}>
-                <Editor />
+                <Editor selectedFile={selectedFile} />
               </EditorContext.Provider>
             </ResizablePanel>
 

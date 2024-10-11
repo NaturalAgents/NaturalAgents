@@ -24,6 +24,7 @@ interface FileItemProps {
   navigateTo: (path: string) => void;
   getDirectoryTree: () => void;
   currentPath: string;
+  setSelectedFile: (fileentry: FileEntry) => void;
 }
 
 const FileItem: React.FC<FileItemProps> = ({
@@ -31,6 +32,7 @@ const FileItem: React.FC<FileItemProps> = ({
   navigateTo,
   getDirectoryTree,
   currentPath,
+  setSelectedFile,
 }) => {
   const [isRenaming, setIsRenaming] = useState(false);
   const [newName, setNewName] = useState(entry.name);
@@ -79,9 +81,14 @@ const FileItem: React.FC<FileItemProps> = ({
         <ContextMenuTrigger asChild>
           <li
             className="cursor-pointer flex items-center space-x-2 mb-2"
-            onClick={() =>
-              !isRenaming && entry.is_directory && navigateTo(entry.path)
-            }
+            onClick={() => {
+              if (!isRenaming && entry.is_directory) {
+                navigateTo(entry.path);
+              }
+              if (!isRenaming && entry.is_file) {
+                setSelectedFile(entry);
+              }
+            }}
           >
             {entry.is_directory ? (
               <CiFolderOn className="text-gray-600" />
