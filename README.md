@@ -47,3 +47,15 @@ NaturalAgents is a community-driven project, and we welcome contributions from e
 ## 💪 Motivation
 
 We're making it easy for anyone to build Agents and custom workflows with AI using just plain english. We aim to democratize the power of agents to everyone
+
+## Updates
+
+- Oct 11, 2024 - save and iterate on agent workflow recipes
+- Oct 9, 2024 - includes summarization macro
+- Oct 6, 2024 - MVP editor; includes prompting and image generation macros
+
+## Upcoming Roadmap
+
+- **Create more diverse macros:** `search the web`, `text to audio`, `repeat`
+- **Include inputs:** `user inputs`, `PDFs`, `images`, `audio`, `postgres database`
+- **Better agent communication -** explore most usuable editor rules to chain agent responses together
