@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { CiLocationArrow1 } from "react-icons/ci";
 import { Button } from "@/components/ui/button";
@@ -12,13 +12,10 @@ import dynamic from "next/dynamic";
 import { ResizablePanel, ResizablePanelGroup } from "./ui/resizable";
 import { AiOutlineLoading } from "react-icons/ai"; // Importing a loading icon
 // import OutputRender from "./command/OutputRender";
-import {
-  EditorContext,
-  EditorProvider,
-  useEditor,
-} from "./context/editorcontext";
+import { useEditor } from "./context/editorcontext";
 import { runDocument, writeFile } from "./services/api";
 import FileExplorer, { FileEntry } from "./file-explorer/FileExplorer";
+import { Session } from "@/services/session";
 const Editor = dynamic(() => import("./command/CommandEditor"), { ssr: false });
 const OutputRender = dynamic(() => import("./command/OutputRender"), {
   ssr: false,
@@ -31,6 +28,10 @@ export default function PlaygroundPage() {
   const [response, setResponse] = useState("");
   const { editorRef, title } = useEditor();
   const { toast } = useToast();
+
+  useEffect(() => {
+    Session.startNewSession();
+  }, []);
 
   const handleRunClick = async () => {
     setLoading(true);

@@ -1,4 +1,5 @@
-class Session {
+// TODO: create a pending queue for when socket connection isn't made on time
+export class Session {
   private static _socket: WebSocket | null = null;
   private static _messageQueue = [];
   public static _history: Record<string, unknown>[] = [];
@@ -34,7 +35,7 @@ class Session {
   private static _connect(): void {
     if (Session.isConnected()) return;
     Session._connecting = true;
-    let wsURL = "/ws";
+    let wsURL = "ws://localhost:3001/ws";
     Session._socket = new WebSocket(wsURL);
     Session._setupSocket();
   }

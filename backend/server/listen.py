@@ -203,7 +203,7 @@ async def websocket_endpoint(websocket: WebSocket):
         {action: "read", file: "/workspace/useragents/filename.txt"}
         {action: "read", file: "/workspace/useragents/filename.txt"}
         {action: "run"}
-        {action: ""}
+        {action: "ping_agent", msg: {}} # ping agent whether or not its waiting for a response
     
     """
     await websocket.accept()
@@ -211,15 +211,19 @@ async def websocket_endpoint(websocket: WebSocket):
     # print("room_id", room_id)
     while True:
         data = await websocket.receive_text()
-        print(data)
-        await websocket.send_text(f"Message text was: {data}")
+        data = json.loads(data)
+        
+        # await websocket.send_text(f"Message text was: {data}")
 
-        # if data["action"] == "run":
-        #     response = processPayload(data.content)
-        #     await websocket.send_text({"message": json.dumps(response)})
+        if data["action"] == "run":
+            response = processPayload(data.content)
+            await websocket.send_text({"run_message": json.dumps(response)})
 
-        # else:
-        #     await websocket.send_text({"message": "action not supported"})
+        if data["action"] == "ping_agent":
+            pass
+
+        else:
+            await websocket.send_text({"message": "action not supported"})
         
 
 

@@ -31,6 +31,7 @@ import { readFile } from "../services/api";
 const getCustomSlashMenuItems = (
   editor: BlockNoteEditor
 ): DefaultReactSuggestionItem[] => [
+  // @ts-ignore
   userInputItem(editor),
   // searchWebItem(editor),
   // scrapeURLItem(editor),
@@ -44,23 +45,9 @@ const getCustomSlashMenuItems = (
 ];
 
 const Editor = ({ selectedFile }: { selectedFile: FileEntry | null }) => {
-  // Creates a new editor instance.
   const [initialContent, setInitialContent] = useState<PartialBlock[] | null>(
     null
   );
-
-  const loadingBlock: PartialBlock = {
-    type: "paragraph",
-    content: [
-      {
-        type: "text",
-        text: "File is loading ...",
-        styles: {
-          bold: true,
-        },
-      },
-    ],
-  };
 
   const editor = useMemo(() => {
     if (!initialContent) {
