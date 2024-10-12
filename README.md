@@ -50,8 +50,8 @@ We're making it easy for anyone to build Agents and custom workflows with AI usi
 
 ## Updates
 
-- Oct 11, 2024 - save and iterate on agent workflow recipes
-- Oct 9, 2024 - includes summarization macro
+- Oct 11, 2024 - save and recall recipe files for later
+- Oct 9, 2024 - added summarization macro
 - Oct 6, 2024 - MVP editor; includes prompting and image generation macros
 
 ## Upcoming Roadmap
