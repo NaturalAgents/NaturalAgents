@@ -66,7 +66,11 @@ export const readFile = async (path: string) => {
   const response = await fetch(`/api/retrieve-file?path=${path}`);
   if (response.ok) {
     const res = await response.json();
-    return res.data;
+    const data = JSON.parse(res.data);
+    if (typeof data !== "object") {
+      return null;
+    }
+    return data;
   }
 };
 

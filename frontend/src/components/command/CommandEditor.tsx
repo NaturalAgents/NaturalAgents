@@ -49,9 +49,25 @@ const Editor = ({ selectedFile }: { selectedFile: FileEntry | null }) => {
     null
   );
 
-  const editor = useCreateBlockNote({
-    schema,
-  });
+  const loadingBlock: PartialBlock = {
+    type: "paragraph",
+    content: [
+      {
+        type: "text",
+        text: "File is loading ...",
+        styles: {
+          bold: true,
+        },
+      },
+    ],
+  };
+
+  const editor = useMemo(() => {
+    if (!initialContent) {
+      return BlockNoteEditor.create({ schema });
+    }
+    return BlockNoteEditor.create({ schema, initialContent });
+  }, [initialContent]);
 
   const { editorRef, setTitle, title } = useEditor();
   editorRef.current = editor;
@@ -59,7 +75,10 @@ const Editor = ({ selectedFile }: { selectedFile: FileEntry | null }) => {
   const read = async () => {
     if (selectedFile) {
       const res = await readFile(selectedFile.path);
-      console.log("file details", res);
+      if (res) {
+        setTitle(res.title);
+        setInitialContent(JSON.parse(res.text));
+      }
     }
   };
 
@@ -69,34 +88,39 @@ const Editor = ({ selectedFile }: { selectedFile: FileEntry | null }) => {
 
   return (
     <div className="flex flex-1 items-center px-4 py-6 w-full">
-      <div className="w-full max-w-4xl min-h-[500px] border border-gray-300 rounded-lg shadow-md p-6 bg-white relative">
-        {/* Card Title (Notion-style) */}
-        <input
-          type="text"
-          placeholder="Untitled"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          className="text-3xl font-bold focus:outline-none w-full placeholder-gray-400 mb-4"
-        />
-        <div className="h-[450px] overflow-y-auto">
-          {editor ? (
-            <BlockNoteView editor={editor} slashMenu={false} theme={"light"}>
-              <SuggestionMenuController
-                triggerCharacter={"/"}
-                getItems={async (query) =>
-                  filterSuggestionItems(
-                    //@ts-ignore
-                    [...getCustomSlashMenuItems(editor)],
-                    query
-                  )
-                }
-              />
-            </BlockNoteView>
-          ) : (
-            "Loading"
-          )}
+      {selectedFile && (
+        <div className="w-full max-w-4xl min-h-[500px] border border-gray-300 rounded-lg shadow-md p-6 bg-white relative">
+          {/* Card Title (Notion-style) */}
+          <div>{selectedFile.name}</div>
+          <input
+            type="text"
+            placeholder="Untitled"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="text-3xl font-bold focus:outline-none w-full placeholder-gray-400 mb-4"
+          />
+          <div className="h-[450px] overflow-y-auto">
+            {editor ? (
+              <BlockNoteView editor={editor} slashMenu={false} theme={"light"}>
+                <SuggestionMenuController
+                  triggerCharacter={"/"}
+                  getItems={async (query) =>
+                    filterSuggestionItems(
+                      //@ts-ignore
+                      [...getCustomSlashMenuItems(editor)],
+                      query
+                    )
+                  }
+                />
+              </BlockNoteView>
+            ) : (
+              "Loading ... "
+            )}
+          </div>
         </div>
-      </div>
+      )}
+
+      {!selectedFile && "Open or create a file"}
     </div>
   );
 };
