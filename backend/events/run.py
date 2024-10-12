@@ -2,78 +2,124 @@ import json
 from memory.memory import Memory
 from events.tools import generate_image, text_generate, summarize
 from events.PROMPTS import SUMMARY_PROMPT
+import asyncio 
 
-memory = Memory()
+ACTION_TYPES = {"<command>:generate", "<command>:image_generation", "<command>:summarize", "<command>:userinput"}
 
-ACTION_TYPES = {"<command>:generate", "<command>:image_generation", "<command>:summarize"}
+class Run:
+    memory: Memory
+    state: str
+    resume_block_index: int
+    resume_item_index: int
+    sid: str
 
-# TODO: handle the history with image params
-def processPayload(payload):
-    obj = json.loads(payload)    
-    bubbles_blocks = find_vertical_bubbles(obj)
+    user_input_future = asyncio.Future()
 
-    for block in bubbles_blocks:
-        memory.create_node_history()
-        for item in block:
-            image = False
-            
 
-            chat_history = memory.latest_node_history()
-            if item[0] == "<command>:generate":
-                response = text_generate(item[1], history=chat_history)
-                memory.add_node_history(item[1], "user", item[0])
-
-            elif item[0] == "<command>:image_generation":
-                response = generate_image(item[1])
-                memory.add_node_history(item[1], "user", item[0])
-                image = True
-
-            elif item[0] == "<command>:summarize":
-                response = summarize(history=chat_history)
-                memory.add_node_history(SUMMARY_PROMPT, "user", item[0])
-
-            else:
-                response = "command is not supported"
-
-            memory.add_node_history(response, "assistant", item[0], image=image)
-
-    output = memory.markdown_response()
-    return output
+    def __init__(self, sid):
+        self.memory = Memory()
+        self.state = "idle"
+        self.sid = sid
 
 
 
-def find_vertical_bubbles(editor_content):
-    vertical_bubbles = []
+    def process_plan(self, editor_content):
+        vertical_bubbles = []
 
-    def search_bubbles(content):
-        current_chain = []
+        def search_bubbles(content):
+            current_chain = []
 
-        for item in content:
+            for item in content:
+                if item['type'] == 'bubble':
+                    current_chain.append((item["props"]["text"], item["content"][0]["text"]))
+                    
+                    
+
+                if item["type"] == 'noparam':
+                    current_chain.append((item["props"]["text"],))
+                
+
+                if 'children' in item and item['children']:
+                    child_bubbles = search_bubbles(item['children'])
+                    current_chain.extend(child_bubbles)
+
+
+            return current_chain
+
+        for item in editor_content:
             if item['type'] == 'bubble':
-                current_chain.append((item["props"]["text"], item["content"][0]["text"]))
+                chain = [(item["props"]["text"], item["content"][0]["text"])]
+                if 'children' in item and item['children']:
+                    child_bubbles = search_bubbles(item['children'])
+                    chain.extend(child_bubbles)
+                vertical_bubbles.append(chain)
+
+        return vertical_bubbles
+
+
+    
+    async def run(self, payload, websocket, resume=False, resume_params={}):
+        obj = json.loads(payload)    
+        bubbles_blocks = self.process_plan(obj)
+        self.state = "running"
+
+        if resume:
+            pass
+        else:
+            start_block_index = 0
+            start_block_item_index = 0
+
+
+        for i in range(start_block_index, len(bubbles_blocks)):
+            block = bubbles_blocks[i]
+            self.memory.create_node_history()
+
+            for j in range(start_block_item_index, len(block)):
+                item = block[j]
+                image = False
                 
+
+                chat_history = self.memory.latest_node_history()
+                if item[0] == "<command>:generate":
+                    response = text_generate(item[1], history=chat_history)
+                    self.memory.add_node_history(item[1], "user", item[0])
+
+                elif item[0] == "<command>:image_generation":
+                    response = generate_image(item[1])
+                    self.memory.add_node_history(item[1], "user", item[0])
+                    image = True
+
+                elif item[0] == "<command>:summarize":
+                    response = summarize(history=chat_history)
+                    self.memory.add_node_history(SUMMARY_PROMPT, "user", item[0])
+
+                elif item[0] == "<command>:userinput" and not resume:
+                    response = {"request": item[1]}
+                    self.state = "pending"
+
+                    print("waiting for user")
+                    await websocket.send_json({"request": "userinput", "msg": item[1]})
+                    user_input = await self.user_input_future
+
                 
-
-            if item["type"] == 'noparam':
-                current_chain.append((item["props"]["text"],))
-            
-
-            if 'children' in item and item['children']:
-                child_bubbles = search_bubbles(item['children'])
-                current_chain.extend(child_bubbles)
+                elif item[0] == "<command>:userinput" and resume:
+                    print(resume_params)
 
 
-        return current_chain
+                else:
+                    response = "command is not supported"
 
-    for item in editor_content:
-        if item['type'] == 'bubble':
-            chain = [(item["props"]["text"], item["content"][0]["text"])]
-            if 'children' in item and item['children']:
-                child_bubbles = search_bubbles(item['children'])
-                chain.extend(child_bubbles)
-            vertical_bubbles.append(chain)
+                self.memory.add_node_history(response, "assistant", item[0], image=image)
 
-    return vertical_bubbles
+
+        
+        output = self.memory.markdown_response()
+        self.state = "finished"
+        websocket.send_json({"output": output})
+        
+
+    def set_user_info(self, user_info):
+        asyncio.call_soon_threadsafe(self.user_input_future.set_result, user_info["msg"])
 
 
 if __name__ == "__main__":
@@ -106,7 +152,7 @@ if __name__ == "__main__":
     json_data = json.loads(json_data)
 
 
-    bubbles = find_vertical_bubbles(json_data)
+    bubbles = Run().process_plan(json_data)
     print(bubbles[0])
 
 

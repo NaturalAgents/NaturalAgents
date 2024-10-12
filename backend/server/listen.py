@@ -1,7 +1,7 @@
 from server.modeltypes import DataModel, HandleFolder, HandleFile, FileWrite
 from fastapi import FastAPI, HTTPException, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
-from events.run import processPayload
+from server.session.manager import Manager
 import shutil
 import json 
 import os
@@ -21,7 +21,8 @@ def home():
 @app.post("/api/data")
 def receive_data(data: DataModel):
     # Process the received data
-    response = processPayload(data.content)
+    # response = processPayload(data.content)
+    response = "hello"
 
     return {"message": response}
 
@@ -202,29 +203,24 @@ async def websocket_endpoint(websocket: WebSocket):
         {action: "initialize"} # setup workspace if it doesn't exist
         {action: "read", file: "/workspace/useragents/filename.txt"}
         {action: "read", file: "/workspace/useragents/filename.txt"}
-        {action: "run"}
+        {action: "run", content: {}} # run recipe
         {action: "ping_agent", msg: {}} # ping agent whether or not its waiting for a response
     
     """
+    
     await websocket.accept()
-    print("connection")
-    # print("room_id", room_id)
+    Manager.set_websocket(websocket)
+
     while True:
         data = await websocket.receive_text()
         data = json.loads(data)
-        
-        # await websocket.send_text(f"Message text was: {data}")
 
         if data["action"] == "run":
-            response = processPayload(data.content)
-            await websocket.send_text({"run_message": json.dumps(response)})
+            # await websocket.send_text( json.dumps(data))
+            await Manager.incoming(data)
 
         if data["action"] == "ping_agent":
             pass
-
-        else:
-            await websocket.send_text({"message": "action not supported"})
-        
 
 
 
