@@ -1,8 +1,7 @@
 import { createReactBlockSpec } from "@blocknote/react";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
-import { useRef } from "react";
-import { PartialBlock } from "@blocknote/core";
+
 // Function to map color to classes
 const getColorClass = (color: string) => {
   switch (color) {
@@ -13,7 +12,7 @@ const getColorClass = (color: string) => {
     case "red":
       return "bg-red-500";
     case "orange":
-      return "bg-orange-500 hover:bg-orange-600";
+      return "bg-orange-600";
     default:
       return "bg-blue-700"; // Default fallback color
   }
@@ -54,7 +53,6 @@ export const Bubble = createReactBlockSpec(
             id="cardInput"
             className="border-none focus:outline-none w-full min-h-[100px] placeholder-gray-400"
             style={{ padding: "8px" }} // Padding for the editable area
-            // onInput={handleInput} // Call handleInput on input
           ></div>
         </Card>
       );

@@ -25,15 +25,16 @@ const InsertBlockCreate = (text: string, styles = {}) => {
   return block;
 };
 
-export const userInputItem = (editor: BlockNoteEditor) => ({
+export const userInputItem = (editor: typeof schema.BlockNoteEditor) => ({
   title: "Get human user input",
   onItemClick: () => {
-    const currentBlock = editor.getTextCursorPosition().block;
-    const block: PartialBlock = InsertBlockCreate("<command>:user_input", {
-      bold: true,
-      textColor: "blue",
+    insertOrUpdateBlock(editor, {
+      type: "bubble",
+      props: {
+        text: "<command>:userinput",
+        color: "orange",
+      },
     });
-    editor.insertBlocks([block], currentBlock, "after");
   },
   aliases: ["userinput", "ui"],
   group: "Input",
