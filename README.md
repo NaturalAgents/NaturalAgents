@@ -36,7 +36,7 @@ OPENAI_API_KEY=<your_api_key>
 docker-compose up --build
 ```
 
-## How to Contribute
+## 🤝 How to Contribute
 
 NaturalAgents is a community-driven project, and we welcome contributions from everyone! There are many ways to be involved:
 
@@ -48,13 +48,13 @@ NaturalAgents is a community-driven project, and we welcome contributions from e
 
 We're making it easy for anyone to build Agents and custom workflows with AI using just plain english. We aim to democratize the power of agents to everyone
 
-## Updates
+## 🚀 Updates
 
 - Oct 11, 2024 - save and recall recipe files for later
 - Oct 9, 2024 - added summarization macro
 - Oct 6, 2024 - MVP editor; includes prompting and image generation macros
 
-## Upcoming Roadmap
+## 🔥 Upcoming Roadmap
 
 - **Create more diverse macros:** `search the web`, `text to audio`, `repeat`
 - **Include inputs:** `user inputs`, `PDFs`, `images`, `audio`, `postgres database`
