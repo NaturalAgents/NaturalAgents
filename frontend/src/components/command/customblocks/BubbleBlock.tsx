@@ -97,7 +97,7 @@ export const Bubble = createReactBlockSpec(
 
           {/* 3-dotted menu button in top-right */}
 
-          <VisibleMenu updateProp={updateProp} defaultVis={vis} />
+          {!send && <VisibleMenu updateProp={updateProp} defaultVis={vis} />}
           <span className="text-sm underline">{prompt}</span>
 
           {send ? (
