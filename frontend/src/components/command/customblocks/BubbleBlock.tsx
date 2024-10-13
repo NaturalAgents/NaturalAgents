@@ -1,19 +1,11 @@
 import { createReactBlockSpec } from "@blocknote/react";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
-import { FaClosedCaptioning } from "react-icons/fa";
-import { RiArrowRightSLine, RiCheckLine, RiMoreFill } from "react-icons/ri";
+import { RiArrowRightSLine } from "react-icons/ri";
 import { Button } from "@/components/ui/button";
 import { Session } from "@/services/session";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
-import {
-  ContextMenu,
-  ContextMenuCheckboxItem,
-  ContextMenuContent,
-  ContextMenuItem,
-  ContextMenuTrigger,
-} from "@/components/ui/context-menu";
 import VisibleMenu from "./utils/visibilityMenu";
 
 // Function to map color to classes
