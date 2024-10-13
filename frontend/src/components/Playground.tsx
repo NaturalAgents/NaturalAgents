@@ -10,10 +10,9 @@ import { FaRegSave } from "react-icons/fa";
 import dynamic from "next/dynamic";
 
 import { ResizablePanel, ResizablePanelGroup } from "./ui/resizable";
-import { AiOutlineLoading } from "react-icons/ai"; // Importing a loading icon
-// import OutputRender from "./command/OutputRender";
+import { AiOutlineLoading } from "react-icons/ai";
 import { useEditor } from "./context/editorcontext";
-import { runDocument, writeFile } from "./services/api";
+import { writeFile } from "./services/api";
 import FileExplorer, { FileEntry } from "./file-explorer/FileExplorer";
 import { Session } from "@/services/session";
 const Editor = dynamic(() => import("./command/CommandEditor"), { ssr: false });
@@ -25,21 +24,37 @@ export default function PlaygroundPage() {
   const [isSideViewOpen, setIsSideViewOpen] = useState(true);
   const [selectedFile, setSelectedFile] = useState<FileEntry | null>(null);
   const [loading, setLoading] = useState(false);
-  const [response, setResponse] = useState("");
   const { editorRef, title } = useEditor();
   const { toast } = useToast();
 
   useEffect(() => {
     Session.startNewSession();
+
+    const finishRun = async (event: Event) => {
+      const customEvent = event as CustomEvent; // Type casting to CustomEvent
+      const newMessage = customEvent.detail.data;
+      if (newMessage.finished) {
+        setLoading(false);
+      }
+    };
+
+    Session.addEventListener("finished", finishRun);
+
+    return () => {
+      Session.removeEventListener("finished", finishRun);
+    };
   }, []);
 
   const handleRunClick = async () => {
     setLoading(true);
     setIsSideViewOpen(true); // Open side view when Run is clicked
-    const res = await runDocument(editorRef);
-    setResponse(res["message"]);
-    console.log("incoming response", res["message"]);
-    setLoading(false);
+
+    if (editorRef) {
+      const data = editorRef.current?.document || [];
+      Session.send(
+        JSON.stringify({ action: "run", content: JSON.stringify(data) })
+      );
+    }
   };
 
   const handleCloseSideView = () => {
@@ -113,10 +128,7 @@ export default function PlaygroundPage() {
             {isSideViewOpen && (
               <div className="border border-gray-300 w-1/2 h-screen overflow-y-scroll	bg-white">
                 <ResizablePanel>
-                  <OutputRender
-                    handleCloseSideView={handleCloseSideView}
-                    response={response}
-                  />
+                  <OutputRender handleCloseSideView={handleCloseSideView} />
                 </ResizablePanel>
               </div>
             )}

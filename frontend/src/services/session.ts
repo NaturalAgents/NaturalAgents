@@ -6,6 +6,7 @@ export class Session {
   private static _connecting = false;
 
   private static _disconnecting = false;
+  private static _eventTarget = new EventTarget();
 
   public static restoreOrStartNewSession() {
     if (Session.isConnected()) {
@@ -56,9 +57,36 @@ export class Session {
       try {
         data = JSON.parse(e.data);
         Session._history.push(data);
+
+        if (data.finished) {
+          const event = new CustomEvent("finished", {
+            detail: { data },
+          });
+          Session._eventTarget.dispatchEvent(event);
+        } else {
+          const event = new CustomEvent("sessionMessage", {
+            detail: { data },
+          });
+
+          Session._eventTarget.dispatchEvent(event);
+        }
       } catch (err) {
         return;
       }
     };
+  }
+
+  public static addEventListener(
+    type: string,
+    listener: EventListenerOrEventListenerObject
+  ) {
+    Session._eventTarget.addEventListener(type, listener);
+  }
+
+  public static removeEventListener(
+    type: string,
+    listener: EventListenerOrEventListenerObject
+  ) {
+    Session._eventTarget.removeEventListener(type, listener);
   }
 }

@@ -26,10 +26,12 @@ class Manager:
             asyncio.create_task(self.session[sid].run(content, self.websocket))
             await self.websocket.send_json({"sid": sid})
 
-        if data["action"] == "ping":
+        if data["action"] == "ping_agent":
             content = data["content"]
             sid = data["sid"]
-            self.session[sid].set_user_info(content)
+            if (sid in self.session):
+                self.session[sid].set_user_info(content)
+
             
 
     @classmethod

@@ -220,7 +220,7 @@ async def websocket_endpoint(websocket: WebSocket):
             await Manager.incoming(data)
 
         if data["action"] == "ping_agent":
-            pass
+            await Manager.incoming(data)
 
 
 

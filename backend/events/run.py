@@ -1,4 +1,5 @@
 import json
+from typing import List
 from memory.memory import Memory
 from events.tools import generate_image, text_generate, summarize
 from events.PROMPTS import SUMMARY_PROMPT
@@ -9,9 +10,8 @@ ACTION_TYPES = {"<command>:generate", "<command>:image_generation", "<command>:s
 class Run:
     memory: Memory
     state: str
-    resume_block_index: int
-    resume_item_index: int
     sid: str
+    user_inputs: List[str]
 
     user_input_future = asyncio.Future()
 
@@ -20,6 +20,7 @@ class Run:
         self.memory = Memory()
         self.state = "idle"
         self.sid = sid
+        self.user_inputs = []
 
 
 
@@ -58,27 +59,18 @@ class Run:
 
 
     
-    async def run(self, payload, websocket, resume=False, resume_params={}):
+    async def run(self, payload, websocket):
         obj = json.loads(payload)    
         bubbles_blocks = self.process_plan(obj)
         self.state = "running"
 
-        if resume:
-            pass
-        else:
-            start_block_index = 0
-            start_block_item_index = 0
 
-
-        for i in range(start_block_index, len(bubbles_blocks)):
-            block = bubbles_blocks[i]
+        for block in bubbles_blocks:
             self.memory.create_node_history()
 
-            for j in range(start_block_item_index, len(block)):
-                item = block[j]
+            for item in block:
                 image = False
-                
-
+            
                 chat_history = self.memory.latest_node_history()
                 if item[0] == "<command>:generate":
                     response = text_generate(item[1], history=chat_history)
@@ -93,18 +85,17 @@ class Run:
                     response = summarize(history=chat_history)
                     self.memory.add_node_history(SUMMARY_PROMPT, "user", item[0])
 
-                elif item[0] == "<command>:userinput" and not resume:
+                elif item[0] == "<command>:userinput":
                     response = {"request": item[1]}
                     self.state = "pending"
-
-                    print("waiting for user")
                     await websocket.send_json({"request": "userinput", "msg": item[1]})
+
+                    self.state = "running"
                     user_input = await self.user_input_future
-
-                
-                elif item[0] == "<command>:userinput" and resume:
-                    print(resume_params)
-
+                    self.user_inputs.append(user_input)
+                    info_request = "Information requested from user: {}\n\n User response: {}".format(item[1], user_input)
+                    self.memory.add_node_history(info_request, "user", item[0])
+                    continue
 
                 else:
                     response = "command is not supported"
@@ -115,11 +106,14 @@ class Run:
         
         output = self.memory.markdown_response()
         self.state = "finished"
-        websocket.send_json({"output": output})
+        await websocket.send_json({"output": output})
+        await websocket.send_json({"finished": True})
+
         
 
     def set_user_info(self, user_info):
-        asyncio.call_soon_threadsafe(self.user_input_future.set_result, user_info["msg"])
+        loop = asyncio.get_running_loop()
+        loop.call_soon_threadsafe(self.user_input_future.set_result, user_info["msg"])
 
 
 if __name__ == "__main__":

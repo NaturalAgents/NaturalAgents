@@ -30,6 +30,7 @@
     "@radix-ui/react-tooltip": "^1.1.2",
     "@react-hook/window-size": "^3.1.1",
     "@shadcn/ui": "^0.0.4",
+    "@types/uuid": "^10.0.0",
     "@uiw/react-codemirror": "^4.23.3",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
@@ -47,6 +48,7 @@
     "shadcn": "^2.1.0",
     "tailwind-merge": "^2.5.2",
     "tailwindcss-animate": "^1.0.7",
+    "uuid": "^10.0.0",
     "vaul": "^1.0.0",
     "y-websocket": "^2.0.4",
     "yjs": "^13.6.19"
