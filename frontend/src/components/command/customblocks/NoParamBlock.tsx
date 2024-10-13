@@ -1,5 +1,6 @@
 import { createReactBlockSpec } from "@blocknote/react";
 import { Badge } from "@/components/ui/badge";
+import VisibleMenu from "./utils/visibilityMenu";
 // Function to map color to classes
 const getColorClass = (color: string) => {
   switch (color) {
@@ -28,19 +29,29 @@ export const NoParam = createReactBlockSpec(
         default: "blue",
         values: ["blue", "green", "red", "orange"], // Define allowed colors
       },
+      vis: {
+        default: true,
+      },
     },
     content: "inline", // No rich text content; the button itself is the main content
   },
   {
     render: (props) => {
-      const { text, color } = props.block.props;
+      const { text, color, vis } = props.block.props;
 
+      const updateProp = (visible: boolean) => {
+        props.editor.updateBlock(props.block, {
+          type: "noparam",
+          props: { vis: visible },
+        });
+      };
       return (
         <>
           <span className="inline-block align-middle">
             <Badge variant="outline" className={`bg-purple-500 text-white`}>
               {text}
             </Badge>
+            <VisibleMenu updateProp={updateProp} defaultVis={vis} />
           </span>
           <div className="inline-content"></div>
         </>

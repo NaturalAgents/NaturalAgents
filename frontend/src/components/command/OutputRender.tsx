@@ -41,6 +41,7 @@ const OutputRender = ({
             prompt: newMessage.msg,
             send: true,
             sid: sidRef.current,
+            vis: true,
           },
           content: [],
           children: [],

@@ -5,7 +5,10 @@ from events.tools import generate_image, text_generate, summarize
 from events.PROMPTS import SUMMARY_PROMPT
 import asyncio 
 
-ACTION_TYPES = {"<command>:generate", "<command>:image_generation", "<command>:summarize", "<command>:userinput"}
+ACTION_TYPES = {"<command>:generate", 
+                "<command>:image_generation", 
+                "<command>:summarize", 
+                "<command>:userinput"}
 
 class Run:
     memory: Memory
@@ -32,12 +35,13 @@ class Run:
 
             for item in content:
                 if item['type'] == 'bubble':
-                    current_chain.append((item["props"]["text"], item["content"][0]["text"]))
-                    
-                    
+                    current_chain.append({"type": item["props"]["text"], 
+                                          "prompt": item["content"][0]["text"],
+                                          "vis": item["props"]["vis"]})
 
                 if item["type"] == 'noparam':
-                    current_chain.append((item["props"]["text"],))
+                    current_chain.append({"type": item["props"]["text"], 
+                                          "vis": item["props"]["vis"]})
                 
 
                 if 'children' in item and item['children']:
@@ -49,11 +53,17 @@ class Run:
 
         for item in editor_content:
             if item['type'] == 'bubble':
-                chain = [(item["props"]["text"], item["content"][0]["text"])]
-                if 'children' in item and item['children']:
-                    child_bubbles = search_bubbles(item['children'])
-                    chain.extend(child_bubbles)
-                vertical_bubbles.append(chain)
+                chain = [{"type": item["props"]["text"], "prompt": item["content"][0]["text"], "vis": item["props"]["vis"]}]
+            elif item['type'] == 'noparam':
+                chain = [{"type": item["props"]["text"], "vis": item["props"]["vis"]}] 
+
+            else:
+                chain = []
+
+            if 'children' in item and item['children']:
+                child_bubbles = search_bubbles(item['children'])
+                chain.extend(child_bubbles)
+            vertical_bubbles.append(chain)
 
         return vertical_bubbles
 
@@ -70,37 +80,43 @@ class Run:
 
             for item in block:
                 image = False
+
+                item_type = item["type"]
+                vis = item["vis"]
             
                 chat_history = self.memory.latest_node_history()
-                if item[0] == "<command>:generate":
-                    response = text_generate(item[1], history=chat_history)
-                    self.memory.add_node_history(item[1], "user", item[0])
+                if item_type == "<command>:generate":
+                    prompt = item["prompt"]
+                    response = text_generate(prompt, history=chat_history)
+                    self.memory.add_node_history(prompt, "user", item_type)
 
-                elif item[0] == "<command>:image_generation":
-                    response = generate_image(item[1])
-                    self.memory.add_node_history(item[1], "user", item[0])
+                elif item_type == "<command>:image_generation":
+                    prompt = item["prompt"]
+                    response = generate_image(prompt)
+                    self.memory.add_node_history(prompt, "user", item_type)
                     image = True
 
-                elif item[0] == "<command>:summarize":
+                elif item_type == "<command>:summarize":
                     response = summarize(history=chat_history)
-                    self.memory.add_node_history(SUMMARY_PROMPT, "user", item[0])
+                    self.memory.add_node_history(SUMMARY_PROMPT, "user", item_type)
 
-                elif item[0] == "<command>:userinput":
-                    response = {"request": item[1]}
+                elif item_type == "<command>:userinput":
+                    prompt = item["prompt"]
+                    response = {"request": prompt}
                     self.state = "pending"
-                    await websocket.send_json({"request": "userinput", "msg": item[1]})
+                    await websocket.send_json({"request": "userinput", "msg": prompt})
 
                     self.state = "running"
                     user_input = await self.user_input_future
                     self.user_inputs.append(user_input)
-                    info_request = "Information requested from user: {}\n\n User response: {}".format(item[1], user_input)
-                    self.memory.add_node_history(info_request, "user", item[0])
+                    info_request = "Information requested from user: {}\n\n User response: {}".format(prompt, user_input)
+                    self.memory.add_node_history(info_request, "user", item_type)
                     continue
 
                 else:
                     response = "command is not supported"
 
-                self.memory.add_node_history(response, "assistant", item[0], image=image)
+                self.memory.add_node_history(response, "assistant", item_type, visible=vis, image=image)
 
 
         

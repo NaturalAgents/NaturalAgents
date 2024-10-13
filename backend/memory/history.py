@@ -3,7 +3,7 @@ class ShortTermMemory:
         self.history = []
 
 
-    def queue_history(self, content, role, command, image=False):
+    def queue_history(self, content, role, command, visible=True, image=False):
         historical_content = []
         
         if image:
@@ -20,12 +20,16 @@ class ShortTermMemory:
         historical_content.append(content_info)
 
 
-        self.history.append({"content": historical_content, "role": role, "command": command})
+        self.history.append({"content": historical_content, "role": role, "command": command, "visible": visible})
 
 
-    def get_history(self):
+    def get_history(self, get_vis=False):
         history = self.history
-        clean_history = [{"content": i["content"], "role": i["role"]} for i in history]
+        if get_vis:
+            clean_history = [{"content": i["content"], "role": i["role"], "visible": i["visible"]} for i in history]
+        else:
+
+            clean_history = [{"content": i["content"], "role": i["role"]} for i in history]
         return clean_history
 
     def get_latest_response(self):

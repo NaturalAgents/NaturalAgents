@@ -11,8 +11,8 @@ class Memory:
         self.agent_histories.append(mem)
 
 
-    def add_node_history(self, content, role, command, image=False):
-        self.agent_histories[-1].queue_history(content, role, command, image=image)
+    def add_node_history(self, content, role, command, visible=True, image=False):
+        self.agent_histories[-1].queue_history(content, role, command, visible=visible, image=image)
 
 
     def latest_node_history(self):
@@ -29,16 +29,16 @@ class Memory:
     def markdown_response(self):
         output = ""
         for count, agent in enumerate(self.agent_histories):
-            output += "# Agent {}\n\n\n".format(count + 1)
-            history = agent.get_history()
+            output += "\n\n\n"
+            history = agent.get_history(get_vis=True)
             for item in history:
                 if item["role"] == "assistant":
-                    for content in item["content"]:
-
-                        if content["type"] == "image_url":
-                            output += "![generated image]({})".format(content["image_url"]["url"]) + "\n\n"
-                        else:
-                            output += content["text"] + "\n\n"
+                    if item["visible"]:
+                        for content in item["content"]:
+                            if content["type"] == "image_url":
+                                output += "![generated image]({})".format(content["image_url"]["url"]) + "\n\n"
+                            else:
+                                output += content["text"] + "\n\n"
         
         return output
                     
