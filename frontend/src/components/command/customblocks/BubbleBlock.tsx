@@ -1,6 +1,12 @@
 import { createReactBlockSpec } from "@blocknote/react";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
+import { FaClosedCaptioning } from "react-icons/fa";
+import { RiArrowRightSLine } from "react-icons/ri";
+import { Button } from "@/components/ui/button";
+import { Session } from "@/services/session";
+import { useState } from "react";
+import { Input } from "@/components/ui/input";
 
 // Function to map color to classes
 const getColorClass = (color: string) => {
@@ -29,13 +35,36 @@ export const Bubble = createReactBlockSpec(
         default: "blue",
         values: ["blue", "green", "red", "orange"], // Define allowed colors
       },
+      prompt: {
+        default: "Prompt",
+      },
+      send: {
+        default: false,
+      },
+      sid: {
+        default: "",
+      },
     },
     content: "inline", // No rich text content; the button itself is the main content
   },
   {
     render: (props) => {
-      const { text, color } = props.block.props;
+      const { text, color, prompt, send, sid } = props.block.props;
       const colorClass = getColorClass(color);
+      const [userInput, setUserInput] = useState("");
+      const [disabled, setDisabled] = useState(false);
+
+      const onClick = () => {
+        Session.send(
+          JSON.stringify({
+            action: "ping_agent",
+            sid,
+            content: { msg: userInput },
+          })
+        );
+
+        setDisabled(true);
+      };
 
       return (
         <Card className={`p-4 relative w-full`}>
@@ -45,15 +74,36 @@ export const Bubble = createReactBlockSpec(
           >
             {text}
           </Label>
-          <span className="text-sm underline">Prompt</span>
-          <div
-            ref={props.contentRef}
-            contentEditable
-            suppressContentEditableWarning // Prevent React warning for editable content
-            id="cardInput"
-            className="border-none focus:outline-none w-full min-h-[100px] placeholder-gray-400"
-            style={{ padding: "8px" }} // Padding for the editable area
-          ></div>
+          <span className="text-sm underline">{prompt}</span>
+          {send ? (
+            <Input
+              value={userInput} // Bind the input value to the state
+              onChange={(e) => setUserInput(e.target.value)} // Update state on input change
+              placeholder="Type your response here..."
+              className="mt-2 mb-8"
+            />
+          ) : (
+            <div
+              ref={props.contentRef}
+              contentEditable
+              suppressContentEditableWarning // Prevent React warning for editable content
+              id="cardInput"
+              className="border-none focus:outline-none w-full min-h-[100px] placeholder-gray-400"
+              style={{ padding: "8px" }} // Padding for the editable area
+            ></div>
+          )}
+          {/* Conditionally render the send button */}
+          {send && (
+            <Button
+              variant="default"
+              size="sm"
+              className="absolute bottom-2 right-2 flex items-center gap-2"
+              onClick={onClick}
+              disabled={disabled}
+            >
+              <RiArrowRightSLine className="text-xl" />
+            </Button>
+          )}
         </Card>
       );
     },
