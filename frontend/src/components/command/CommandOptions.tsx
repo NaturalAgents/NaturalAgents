@@ -9,6 +9,7 @@ import { CgWebsite } from "react-icons/cg";
 
 import { BsChatLeftText } from "react-icons/bs";
 import { MdOutlineSummarize } from "react-icons/md";
+import { FaRegFilePdf } from "react-icons/fa6";
 
 const InsertBlockCreate = (text: string, styles = {}) => {
   const block: PartialBlock = {
@@ -119,4 +120,17 @@ export const summarizeItem = (editor: typeof schema.BlockNoteEditor) => ({
   aliases: ["summarize", "su", "summary"],
   group: "Output",
   icon: <MdOutlineSummarize size={18} />,
+});
+
+export const pdfUploadItem = (editor: typeof schema.BlockNoteEditor) => ({
+  title: "Upload PDF",
+  onItemClick: () => {
+    insertOrUpdateBlock(editor, {
+      type: "file",
+      props: {},
+    });
+  },
+  aliases: ["pdfupload", "pdf", "upload"],
+  group: "Input",
+  icon: <FaRegFilePdf size={18} />,
 });

@@ -1,24 +1,18 @@
 "use client";
 
-import {
-  BlockNoteEditor,
-  PartialBlock,
-  filterSuggestionItems,
-} from "@blocknote/core";
+import { BlockNoteEditor, filterSuggestionItems } from "@blocknote/core";
 import {
   DefaultReactSuggestionItem,
   SuggestionMenuController,
-  useCreateBlockNote,
 } from "@blocknote/react";
 import { BlockNoteView } from "@blocknote/mantine";
 import "@blocknote/mantine/style.css";
 import {
   userInputItem,
-  searchWebItem,
-  scrapeURLItem,
   imageGenerationItem,
   textGenerationItem,
   summarizeItem,
+  pdfUploadItem,
 } from "./CommandOptions";
 
 import { schema } from "./customschema/Schema";
@@ -33,21 +27,20 @@ const getCustomSlashMenuItems = (
 ): DefaultReactSuggestionItem[] => [
   // @ts-ignore
   userInputItem(editor),
-  // searchWebItem(editor),
-  // scrapeURLItem(editor),
+  // @ts-ignore
+  // pdfUploadItem(editor),
   // @ts-ignore
   imageGenerationItem(editor),
   // @ts-ignore
   textGenerationItem(editor),
-  // ...getDefaultReactSlashMenuItems(editor),
   // @ts-ignore
   summarizeItem(editor),
 ];
 
 const Editor = ({ selectedFile }: { selectedFile: FileEntry | null }) => {
-  const [initialContent, setInitialContent] = useState<PartialBlock[] | null>(
-    null
-  );
+  const [initialContent, setInitialContent] = useState<
+    (typeof schema.PartialBlock)[] | null
+  >(null);
 
   const editor = useMemo(() => {
     if (!initialContent) {
