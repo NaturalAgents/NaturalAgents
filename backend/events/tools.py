@@ -4,6 +4,7 @@ from litellm import completion
 from dotenv import load_dotenv
 import requests
 import base64
+import os
 
 
 load_dotenv("/workspace/.env")
@@ -37,7 +38,6 @@ def text_generate(prompt, system=None, model="gpt-4o", history=[]):
     
 
     messages.append({ "content": prompt,"role": "user"})
-    print("model inputs", messages)
     response = completion(model=model, messages=messages)
     return response['choices'][0]['message']['content']
 
@@ -51,3 +51,27 @@ def summarize(requirements=None, model="gpt-4o", history=[]):
 
     
     
+def processPDF(data):
+    import fitz
+
+    base64_data = data.split(",", 1)[1]
+    pdf_data = base64.b64decode(base64_data)
+    if not os.path.exists('/workspace/tmp'):
+        os.mkdir('/workspace/tmp')
+    
+    file_path = '/workspace/tmp/tmp.pdf'
+    with open(file_path, "wb") as pdf_file:
+        pdf_file.write(pdf_data)
+
+
+    text = ""
+    doc = fitz.open(file_path)
+    for page in doc:
+        text += page.get_text()
+
+    return text
+        
+
+
+
+

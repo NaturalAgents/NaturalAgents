@@ -24,7 +24,7 @@ export const FileBlock = createReactBlockSpec(
         values: ["PDF", "Image", "Audio"],
       },
       send: {
-        default: true,
+        default: false,
       },
       sid: {
         default: "",
@@ -40,6 +40,7 @@ export const FileBlock = createReactBlockSpec(
     render: (props) => {
       const { fileUrl, fileType, send, sid } = props.block.props;
       const [selectedFile, setSelectedFile] = useState<File | null>(null);
+      const [disabled, setDisabled] = useState<boolean>(false);
 
       // Set accepted file types based on fileType prop
       const getAcceptedFileTypes = () => {
@@ -83,6 +84,8 @@ export const FileBlock = createReactBlockSpec(
             })
           );
         }
+
+        setDisabled(true);
       };
 
       return (
@@ -127,6 +130,7 @@ export const FileBlock = createReactBlockSpec(
                 <Button
                   className="absolute bottom-2 right-2 p-2 gap-2"
                   onClick={sendFile}
+                  disabled={disabled}
                 >
                   <RiArrowRightSLine size={24} />
                 </Button>

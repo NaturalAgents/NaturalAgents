@@ -3,3 +3,4 @@ uvicorn[standard]
 litellm
 python-dotenv
 requests
+pymupdf

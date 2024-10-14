@@ -1,14 +1,15 @@
 import json
 from typing import List
 from memory.memory import Memory
-from events.tools import generate_image, text_generate, summarize
+from events.tools import generate_image, text_generate, summarize, processPDF
 from events.PROMPTS import SUMMARY_PROMPT
 import asyncio 
 
 ACTION_TYPES = {"<command>:generate", 
                 "<command>:image_generation", 
                 "<command>:summarize", 
-                "<command>:userinput"}
+                "<command>:userinput",
+                "file"}
 
 class Run:
     memory: Memory
@@ -43,6 +44,11 @@ class Run:
                     current_chain.append({"type": item["props"]["text"], 
                                           "vis": item["props"]["vis"]})
                 
+                if item["type"] == "file":
+                    current_chain.append({"type": item["type"], 
+                                          "fileType": item["props"]["fileType"],
+                                          "vis": item["props"]["vis"]})
+                
 
                 if 'children' in item and item['children']:
                     child_bubbles = search_bubbles(item['children'])
@@ -54,8 +60,12 @@ class Run:
         for item in editor_content:
             if item['type'] == 'bubble':
                 chain = [{"type": item["props"]["text"], "prompt": item["content"][0]["text"], "vis": item["props"]["vis"]}]
+            
             elif item['type'] == 'noparam':
                 chain = [{"type": item["props"]["text"], "vis": item["props"]["vis"]}] 
+
+            elif item['type'] == 'file':
+                chain = [{"type": item["type"], "fileType": item["props"]["fileType"], "vis": item["props"]["vis"]}]
 
             else:
                 chain = []
@@ -102,16 +112,39 @@ class Run:
 
                 elif item_type == "<command>:userinput":
                     prompt = item["prompt"]
-                    response = {"request": prompt}
                     self.state = "pending"
+                    
                     await websocket.send_json({"request": "userinput", "msg": prompt})
+                    user_input = await self.user_input_future
 
                     self.state = "running"
-                    user_input = await self.user_input_future
                     self.user_inputs.append(user_input)
-                    info_request = "Information requested from user: {}\n\n User response: {}".format(prompt, user_input)
+                    info_request = "Information requested from user: {}\n\nUser response: {}".format(prompt, user_input)
                     self.memory.add_node_history(info_request, "user", item_type)
+
+                    self.user_input_future = asyncio.Future()
                     continue
+                
+                elif item_type == "file":
+                    file_type = item["fileType"]
+
+
+                    if file_type == "PDF":
+                        self.state = "pending"
+
+                        await websocket.send_json({"request": "file", "type": file_type})
+                        user_input = await self.user_input_future
+                        
+                        self.state = "running"
+                        self.user_inputs.append(user_input)
+                        
+                        # extract pdf text and add to history
+                        text = processPDF(user_input)
+                        info_request = "User uploaded {} with the following content\n\n{}".format(file_type, text)
+                        self.memory.add_node_history(info_request, "user", item_type)
+                        
+                        self.user_input_future = asyncio.Future()
+                        continue
 
                 else:
                     response = "command is not supported"

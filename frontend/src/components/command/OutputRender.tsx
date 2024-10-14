@@ -31,7 +31,7 @@ const OutputRender = ({
         sidRef.current = newMessage.sid;
       }
 
-      if (newMessage.request) {
+      if (newMessage.request && newMessage.request == "userinput") {
         contentCopy.push({
           id: uuidv4(),
           type: "bubble",
@@ -46,6 +46,24 @@ const OutputRender = ({
           content: [],
           children: [],
         });
+      }
+
+      if (newMessage.request && newMessage.request == "file") {
+        if (newMessage.type == "PDF") {
+          contentCopy.push({
+            id: uuidv4(),
+            type: "file",
+            props: {
+              fileUrl: "",
+              fileType: "PDF",
+              send: true,
+              sid: sidRef.current,
+              vis: true,
+            },
+            content: [],
+            children: [],
+          });
+        }
       }
 
       if (newMessage.output) {

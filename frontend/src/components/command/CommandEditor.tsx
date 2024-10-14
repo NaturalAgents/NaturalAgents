@@ -28,7 +28,7 @@ const getCustomSlashMenuItems = (
   // @ts-ignore
   userInputItem(editor),
   // @ts-ignore
-  // pdfUploadItem(editor),
+  pdfUploadItem(editor),
   // @ts-ignore
   imageGenerationItem(editor),
   // @ts-ignore
