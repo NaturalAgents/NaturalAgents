@@ -27,6 +27,8 @@ def text_generate(prompt, system=None, model="gpt-4o", history=[]):
     msg_history = history.copy()
     messages = []
 
+
+    # Including all previous history; possibly a better idea to perform RAG for the necessary context?
     for msg in msg_history:
         messages.append(msg)
         if messages[-1]["content"][-1]["type"] == "image_url":
