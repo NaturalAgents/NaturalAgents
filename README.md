@@ -1,7 +1,7 @@
 <div align="center">
     <img src="./frontend/public/static/images/logo.svg" alt="Logo" width="200">
     <h1 align="center">NaturalAgents</h1>
-    <div align="center">Easiest way to build agents in a notion-style editor.</div>
+    <div align="center">Easiest way to build agents in a notion-style editor. <a href="https://github.com/NaturalAgents/NaturalAgents/tree/main/examples">See examples!</a></div>
 </div>
 
 ## 😎 Demo
