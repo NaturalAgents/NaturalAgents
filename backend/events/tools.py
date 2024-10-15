@@ -27,11 +27,10 @@ def text_generate(prompt, system=None, model="gpt-4o", history=[]):
     msg_history = history.copy()
     messages = []
 
-
-    if len(msg_history) >= 1:
-        messages.append(msg_history[-1])
-        if messages[0]["content"][0]["type"] == "image_url":
-            messages[0]["role"] = "user" 
+    for msg in msg_history:
+        messages.append(msg)
+        if messages[-1]["content"][-1]["type"] == "image_url":
+            messages[-1]["role"] = "user" 
 
     if system:
         messages.append({"content": system, "role": "system"})
