@@ -9,13 +9,91 @@ import { useEffect, useRef, useState } from "react";
 import { schema } from "./customschema/Schema";
 import { Session } from "@/services/session";
 import { v4 as uuidv4 } from "uuid";
+import { useEditor } from "../context/editorcontext";
+import { FileEntry } from "../file-explorer/FileExplorer";
+
+const processPreviewPayload = (document: string) => {
+  const blocks = JSON.parse(document);
+
+  // Recursive function to process the blocks and their children
+  const processBlocks = (blockList: any[], isOutermost: boolean): any[] => {
+    return blockList.flatMap((block) => {
+      // Check if the block type is custom
+      if (
+        block.type === "bubble" ||
+        block.type === "noparam" ||
+        block.type === "file"
+      ) {
+        // If it's an outermost block with a custom type, prepend the custom logic paragraph
+        if (isOutermost) {
+          return [
+            {
+              type: "paragraph",
+              props: {
+                text: "your custom logic",
+              },
+              content: [
+                {
+                  type: "text",
+                  text: "your custom logic",
+                  styles: { italic: true },
+                },
+              ],
+              children: [],
+            },
+            {
+              type: "paragraph",
+              props: {
+                text: block.type,
+              },
+              content: [
+                { type: "text", text: block.type, styles: { bold: true } },
+              ],
+              children: processBlocks(block.children, false), // Process children recursively
+            },
+          ];
+        }
+
+        // For non-outermost custom types, simply transform them as before
+        return {
+          type: "paragraph",
+          props: {
+            text: block.type,
+          },
+          content: [{ type: "text", text: block.type, styles: { bold: true } }],
+          children: processBlocks(block.children, false), // Process children recursively
+        };
+      }
+
+      // Process children if they exist
+      if (block.children && Array.isArray(block.children)) {
+        return {
+          ...block,
+          children: processBlocks(block.children, false), // Not outermost anymore
+        };
+      }
+
+      return block; // Return unchanged block if not custom type
+    });
+  };
+
+  // Process the top-level blocks, marking them as outermost
+  const processedBlocks = processBlocks(blocks, true);
+  return processedBlocks;
+};
 
 const OutputRender = ({
   handleCloseSideView,
+  preview = false,
+  selectedFile,
 }: {
   handleCloseSideView: () => void;
+  preview: boolean;
+  selectedFile: FileEntry | null;
 }) => {
   const [initialContent, setInitialContent] = useState([{}]);
+
+  const { document } = useEditor();
 
   const editor = useCreateBlockNote({ schema, initialContent });
   const sidRef = useRef<string>("");
@@ -82,13 +160,30 @@ const OutputRender = ({
     };
   }, [editor]);
 
+  useEffect(() => {
+    if (preview) {
+      const blocks = processPreviewPayload(document);
+      editor.replaceBlocks(editor.document, blocks);
+    }
+  }, [document]);
+
+  // useEffect(() => {
+  //   console.log("here");
+  //   if (preview) {
+  //     const blocks = processPreviewPayload(document);
+  //     editor.replaceBlocks(editor.document, blocks);
+  //   }
+  // }, [selectedFile]);
+
   return (
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-between p-4">
         <Button variant={"ghost"} onClick={handleCloseSideView}>
           <RiArrowRightDoubleFill size={20} />
         </Button>
-        <h1 className="text-lg flex-1 text-center">Results</h1>
+        <h1 className="text-lg flex-1 text-center">
+          {preview ? "Preview" : "Results"}
+        </h1>
       </div>
 
       <Separator />

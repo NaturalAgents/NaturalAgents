@@ -6,6 +6,7 @@ import { CiLocationArrow1 } from "react-icons/ci";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { FaRegSave } from "react-icons/fa";
+import { VscOpenPreview } from "react-icons/vsc";
 
 import dynamic from "next/dynamic";
 
@@ -23,6 +24,7 @@ const OutputRender = dynamic(() => import("./command/OutputRender"), {
 export default function PlaygroundPage() {
   const [isSideViewOpen, setIsSideViewOpen] = useState(true);
   const [selectedFile, setSelectedFile] = useState<FileEntry | null>(null);
+  const [preview, setPreview] = useState(true);
   const [loading, setLoading] = useState(false);
   const { editorRef, title } = useEditor();
   const { toast } = useToast();
@@ -48,6 +50,7 @@ export default function PlaygroundPage() {
   const handleRunClick = async () => {
     setLoading(true);
     setIsSideViewOpen(true); // Open side view when Run is clicked
+    setPreview(false);
 
     if (editorRef) {
       const data = editorRef.current?.document || [];
@@ -59,6 +62,13 @@ export default function PlaygroundPage() {
 
   const handleCloseSideView = () => {
     setIsSideViewOpen(false); // Close side view
+  };
+
+  const handlePreview = () => {
+    if (!loading) {
+      setPreview(true);
+    }
+    setIsSideViewOpen(true);
   };
 
   const handleSaveFile = async () => {
@@ -98,8 +108,16 @@ export default function PlaygroundPage() {
                 className="flex items-center space-x-2"
                 onClick={handleSaveFile}
               >
-                Save File
+                <span>Save File</span>
                 <FaRegSave className="h-4 w-4" />
+              </Button>
+              <Button
+                variant={"outline"}
+                className="flex items-center space-x-2"
+                onClick={handlePreview}
+              >
+                <span>Preview</span>
+                <VscOpenPreview className="h-4 w-4" />
               </Button>
               <Button
                 className="bg-green-600 flex items-center space-x-2"
@@ -128,7 +146,11 @@ export default function PlaygroundPage() {
             {isSideViewOpen && (
               <div className="border border-gray-300 w-1/2 h-screen overflow-y-scroll	bg-white">
                 <ResizablePanel>
-                  <OutputRender handleCloseSideView={handleCloseSideView} />
+                  <OutputRender
+                    handleCloseSideView={handleCloseSideView}
+                    preview={preview}
+                    selectedFile={selectedFile}
+                  />
                 </ResizablePanel>
               </div>
             )}

@@ -49,7 +49,7 @@ const Editor = ({ selectedFile }: { selectedFile: FileEntry | null }) => {
     return BlockNoteEditor.create({ schema, initialContent });
   }, [initialContent]);
 
-  const { editorRef, setTitle, title } = useEditor();
+  const { editorRef, setTitle, title, setDocument } = useEditor();
   editorRef.current = editor;
 
   const read = async () => {
@@ -58,6 +58,7 @@ const Editor = ({ selectedFile }: { selectedFile: FileEntry | null }) => {
       if (res) {
         setTitle(res.title);
         setInitialContent(JSON.parse(res.text));
+        setDocument(res.text);
       }
     }
   };
@@ -70,7 +71,6 @@ const Editor = ({ selectedFile }: { selectedFile: FileEntry | null }) => {
     <div className="flex flex-1 items-center px-4 py-6 w-full">
       {selectedFile && (
         <div className="w-full max-w-4xl min-h-[500px] border border-gray-300 rounded-lg shadow-md p-6 bg-white relative">
-          {/* Card Title (Notion-style) */}
           <div>{selectedFile.name}</div>
           <input
             type="text"
@@ -81,7 +81,12 @@ const Editor = ({ selectedFile }: { selectedFile: FileEntry | null }) => {
           />
           <div className="h-[450px] overflow-y-auto">
             {editor ? (
-              <BlockNoteView editor={editor} slashMenu={false} theme={"light"}>
+              <BlockNoteView
+                editor={editor}
+                slashMenu={false}
+                theme={"light"}
+                onChange={() => setDocument(JSON.stringify(editor.document))}
+              >
                 <SuggestionMenuController
                   triggerCharacter={"/"}
                   getItems={async (query) =>

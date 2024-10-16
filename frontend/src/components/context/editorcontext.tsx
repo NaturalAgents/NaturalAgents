@@ -13,6 +13,8 @@ export type EditorContextType = {
   editorRef: MutableRefObject<typeof schema.BlockNoteEditor | null>;
   title: string;
   setTitle: (title: string) => void;
+  document: string;
+  setDocument: (content: string) => void;
 };
 
 export const EditorContext = createContext<EditorContextType | undefined>(
@@ -22,6 +24,7 @@ export const EditorContext = createContext<EditorContextType | undefined>(
 export const EditorProvider = ({ children }: { children: ReactNode }) => {
   // State for the editor title
   const [title, setTitle] = useState("Untitled");
+  const [document, setDocument] = useState("[{}]");
 
   // Ref for the editor instance
   const editorRef = useState<
@@ -29,7 +32,9 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
   >({ current: null })[0];
 
   return (
-    <EditorContext.Provider value={{ editorRef, title, setTitle }}>
+    <EditorContext.Provider
+      value={{ editorRef, title, setTitle, setDocument, document }}
+    >
       {children}
     </EditorContext.Provider>
   );
