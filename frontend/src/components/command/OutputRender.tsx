@@ -165,6 +165,10 @@ const OutputRender = ({
       const blocks = processPreviewPayload(document);
       editor.replaceBlocks(editor.document, blocks);
     }
+
+    if (document == "[{}] override") {
+      editor.replaceBlocks(editor.document, [{}]);
+    }
   }, [document]);
 
   // useEffect(() => {

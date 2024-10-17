@@ -26,7 +26,7 @@ export default function PlaygroundPage() {
   const [selectedFile, setSelectedFile] = useState<FileEntry | null>(null);
   const [preview, setPreview] = useState(true);
   const [loading, setLoading] = useState(false);
-  const { editorRef, title } = useEditor();
+  const { editorRef, title, setDocument } = useEditor();
   const { toast } = useToast();
 
   useEffect(() => {
@@ -48,6 +48,7 @@ export default function PlaygroundPage() {
   }, []);
 
   const handleRunClick = async () => {
+    setDocument("[{}] override"); // override indicator clears preview component only when "run" is pressed
     setLoading(true);
     setIsSideViewOpen(true); // Open side view when Run is clicked
     setPreview(false);
