@@ -22,7 +22,8 @@ const processPreviewPayload = (document: string) => {
       if (
         block.type === "bubble" ||
         block.type === "noparam" ||
-        block.type === "file"
+        block.type === "file" ||
+        block.type === "mention"
       ) {
         // If it's an outermost block with a custom type, prepend the custom logic paragraph
         if (isOutermost) {
@@ -170,14 +171,6 @@ const OutputRender = ({
       editor.replaceBlocks(editor.document, [{}]);
     }
   }, [document]);
-
-  // useEffect(() => {
-  //   console.log("here");
-  //   if (preview) {
-  //     const blocks = processPreviewPayload(document);
-  //     editor.replaceBlocks(editor.document, blocks);
-  //   }
-  // }, [selectedFile]);
 
   return (
     <div className="flex flex-col h-full">

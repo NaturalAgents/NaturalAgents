@@ -1,46 +1,27 @@
 "use client";
 
 import { BlockNoteEditor, filterSuggestionItems } from "@blocknote/core";
-import {
-  DefaultReactSuggestionItem,
-  SuggestionMenuController,
-} from "@blocknote/react";
+import { SuggestionMenuController } from "@blocknote/react";
 import { BlockNoteView } from "@blocknote/mantine";
 import "@blocknote/mantine/style.css";
-import {
-  userInputItem,
-  imageGenerationItem,
-  textGenerationItem,
-  summarizeItem,
-  pdfUploadItem,
-} from "./CommandOptions";
 
 import { schema } from "./customschema/Schema";
 import { useEffect, useMemo, useState } from "react";
 import { useEditor } from "../context/editorcontext";
 import { FileEntry } from "../file-explorer/FileExplorer";
 import { readFile } from "../services/api";
-
-// List containing all default Slash Menu Items, as well as our custom one.
-const getCustomSlashMenuItems = (
-  editor: BlockNoteEditor
-): DefaultReactSuggestionItem[] => [
-  // @ts-ignore
-  userInputItem(editor),
-  // @ts-ignore
-  pdfUploadItem(editor),
-  // @ts-ignore
-  imageGenerationItem(editor),
-  // @ts-ignore
-  textGenerationItem(editor),
-  // @ts-ignore
-  summarizeItem(editor),
-];
+import {
+  getCustomSlashMenuItems,
+  getMentionMenuItems,
+  trackReferenceBlocks,
+} from "./customblocks/utils/commandEditorMenus";
 
 const Editor = ({ selectedFile }: { selectedFile: FileEntry | null }) => {
   const [initialContent, setInitialContent] = useState<
     (typeof schema.PartialBlock)[] | null
   >(null);
+
+  const [referenceOptions, setReferenceOptions] = useState<any>([]);
 
   const editor = useMemo(() => {
     if (!initialContent) {
@@ -85,14 +66,27 @@ const Editor = ({ selectedFile }: { selectedFile: FileEntry | null }) => {
                 editor={editor}
                 slashMenu={false}
                 theme={"light"}
-                onChange={() => setDocument(JSON.stringify(editor.document))}
+                onChange={() => {
+                  trackReferenceBlocks(editor, setReferenceOptions); // Track the blocks when document changes
+                  setDocument(JSON.stringify(editor.document));
+                }}
               >
                 <SuggestionMenuController
                   triggerCharacter={"/"}
                   getItems={async (query) =>
                     filterSuggestionItems(
-                      //@ts-ignore
                       [...getCustomSlashMenuItems(editor)],
+                      query
+                    )
+                  }
+                />
+
+                <SuggestionMenuController
+                  triggerCharacter={"@"}
+                  getItems={async (query) =>
+                    // Gets the mentions menu items
+                    filterSuggestionItems(
+                      getMentionMenuItems(editor, referenceOptions),
                       query
                     )
                   }
