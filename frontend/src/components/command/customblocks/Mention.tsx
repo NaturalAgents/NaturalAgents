@@ -8,41 +8,47 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { FiX } from "react-icons/fi";
 
-// Recursive component for rendering nested dropdowns using shadcn dropdown menu
 const NestedDropdown = ({
   options,
   onSelect,
   path,
+  isActive,
 }: {
   options: Record<any, any>;
   onSelect: (path: string[]) => void;
   path: string[];
+  isActive: boolean; // Whether the dropdown is active or disabled
 }) => {
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
   const [open, setOpen] = useState(true); // Open the dropdown by default
 
+  // If a key is selected and it has children, render the next level of dropdown
   const handleSelect = (key: string) => {
     setSelectedKey(key);
-    onSelect([...path, key]);
+    onSelect([...path, key]); // Always use a fresh path
   };
 
   return (
     <div>
-      <DropdownMenu open={open} onOpenChange={setOpen}>
+      <DropdownMenu open={isActive && open} onOpenChange={setOpen}>
         <DropdownMenuTrigger>
-          <div></div>
+          <div
+            className={`${isActive ? "cursor-pointer" : "cursor-default"}`}
+          ></div>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-48">
-          {Object.keys(options).map((key) => (
-            <DropdownMenuItem
-              key={key}
-              onClick={() => handleSelect(key)}
-              className="cursor-pointer"
-            >
-              {key}
-            </DropdownMenuItem>
-          ))}
-        </DropdownMenuContent>
+        {isActive && (
+          <DropdownMenuContent className="w-48">
+            {Object.keys(options).map((key) => (
+              <DropdownMenuItem
+                key={key}
+                onClick={() => handleSelect(key)}
+                className="cursor-pointer"
+              >
+                {key}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        )}
       </DropdownMenu>
 
       {/* Recursively render the next level of the dropdown if available */}
@@ -51,7 +57,8 @@ const NestedDropdown = ({
           <NestedDropdown
             options={options[selectedKey]}
             onSelect={onSelect}
-            path={path} // Pass down the current path
+            path={path} // Pass down the updated path
+            isActive={true} // Only the last nested dropdown is active
           />
         </div>
       )}
@@ -66,17 +73,19 @@ const NestComponent = ({
   onSelect,
   path,
   onDelete,
+  isActive,
 }: {
   nest: string;
   options: Record<string, any>; // The full options tree for this level
   onSelect: (path: string[]) => void; // Callback to trigger when a new option is selected
   path: string[]; // Current path
   onDelete: (key: string) => void; // Callback to delete nests from the current one onwards
+  isActive: boolean; // Whether the dropdown is active or disabled
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const handleToggleDropdown = () => {
-    setIsOpen(!isOpen);
+    if (isActive) setIsOpen(!isOpen);
   };
 
   const handleDelete = () => {
@@ -97,12 +106,13 @@ const NestComponent = ({
       />
 
       {/* Open nested dropdown when clicked */}
-      {isOpen && (
+      {isOpen && isActive && (
         <div className="absolute left-0 top-full">
           <NestedDropdown
             options={options}
             onSelect={onSelect}
             path={path} // Pass down the current path
+            isActive={isActive} // Pass isActive to determine if dropdown should be enabled
           />
         </div>
       )}
@@ -126,7 +136,7 @@ export const Mention = createReactBlockSpec(
   },
   {
     render: (props) => {
-      const referenceOptions = JSON.parse(props.block.props.object); // Parse the passed object
+      const referenceOptions = JSON.parse(props.block.props.object);
       const [selectedPath, setSelectedPath] = useState([
         props.block.props.parentKey,
       ]);
@@ -158,6 +168,7 @@ export const Mention = createReactBlockSpec(
                       onSelect={handleSelection}
                       path={selectedPath}
                       onDelete={handleDelete}
+                      isActive={index === selectedPath.length - 1}
                     />
                     {index < selectedPath.length - 1 && (
                       <span className="mx-1">{"->"}</span>
@@ -173,6 +184,7 @@ export const Mention = createReactBlockSpec(
               options={referenceOptions}
               onSelect={handleSelection}
               path={selectedPath}
+              isActive={true}
             />
           </div>
         </div>
