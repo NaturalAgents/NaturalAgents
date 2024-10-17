@@ -1,11 +1,11 @@
 import { Button } from "@/components/ui/button";
 import {
-  ContextMenu,
-  ContextMenuTrigger,
-  ContextMenuContent,
-  ContextMenuCheckboxItem,
-  ContextMenuItem,
-} from "@/components/ui/context-menu";
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuCheckboxItem,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
 import { useState } from "react";
 import { RiMoreFill } from "react-icons/ri";
 
@@ -24,8 +24,8 @@ const VisibleMenu = ({
   };
 
   return (
-    <ContextMenu>
-      <ContextMenuTrigger asChild>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
           className="absolute top-2 right-2 p-2"
@@ -33,19 +33,19 @@ const VisibleMenu = ({
         >
           <RiMoreFill className="text-lg" />
         </Button>
-      </ContextMenuTrigger>
-      <ContextMenuContent className="p-2">
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="p-2">
         {visible ? (
-          <ContextMenuCheckboxItem checked onClick={() => toggleVisible()}>
+          <DropdownMenuCheckboxItem checked onClick={toggleVisible}>
             Display Output
-          </ContextMenuCheckboxItem>
+          </DropdownMenuCheckboxItem>
         ) : (
-          <ContextMenuItem inset onClick={toggleVisible}>
+          <DropdownMenuItem inset onClick={toggleVisible}>
             Display Output
-          </ContextMenuItem>
+          </DropdownMenuItem>
         )}
-      </ContextMenuContent>
-    </ContextMenu>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };
 

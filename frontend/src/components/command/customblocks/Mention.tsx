@@ -7,6 +7,7 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { FiX } from "react-icons/fi";
+import VisibleMenu from "./utils/visibilityMenu";
 
 const NestedDropdown = ({
   options,
@@ -131,15 +132,19 @@ export const Mention = createReactBlockSpec(
       parentKey: {
         default: "",
       },
+      vis: {
+        default: true,
+        values: [true, false],
+      },
     },
     content: "none", // No additional inline content
   },
   {
     render: (props) => {
-      const referenceOptions = JSON.parse(props.block.props.object);
-      const [selectedPath, setSelectedPath] = useState([
-        props.block.props.parentKey,
-      ]);
+      const { object, parentKey, vis } = props.block.props;
+
+      const referenceOptions = JSON.parse(object);
+      const [selectedPath, setSelectedPath] = useState([parentKey]);
 
       // Update the selected path whenever an item is selected from dropdown
       const handleSelection = (path: string[]) => {
@@ -154,40 +159,53 @@ export const Mention = createReactBlockSpec(
         });
       };
 
-      return (
-        <div className="inline-block relative">
-          {/* Display the final selected path */}
-          <span className="bg-purple-200 py-1 px-2 rounded-md">
-            @
-            {selectedPath.length > 0
-              ? selectedPath.map((key, index) => (
-                  <React.Fragment key={key}>
-                    <NestComponent
-                      nest={key}
-                      options={referenceOptions[key] || {}}
-                      onSelect={handleSelection}
-                      path={selectedPath}
-                      onDelete={handleDelete}
-                      isActive={index === selectedPath.length - 1}
-                    />
-                    {index < selectedPath.length - 1 && (
-                      <span className="mx-1">{"->"}</span>
-                    )}
-                  </React.Fragment>
-                ))
-              : ""}
-          </span>
+      const updateProp = (visible: boolean) => {
+        props.editor.updateBlock(props.block, {
+          type: "mention",
+          props: { vis: visible },
+        });
+      };
 
-          {/* Render the nested dropdown for the last item */}
-          <div className="absolute top-full left-0">
-            <NestedDropdown
-              options={referenceOptions}
-              onSelect={handleSelection}
-              path={selectedPath}
-              isActive={true}
-            />
+      return (
+        <>
+          <div className="inline-block relative flex items-center">
+            {/* Display the final selected path */}
+            <div className="inline-block relative">
+              <span className="bg-purple-200 py-1 px-2 rounded-md">
+                @
+                {selectedPath.length > 0
+                  ? selectedPath.map((key, index) => (
+                      <React.Fragment key={key}>
+                        <NestComponent
+                          nest={key}
+                          options={referenceOptions[key] || {}}
+                          onSelect={handleSelection}
+                          path={selectedPath}
+                          onDelete={handleDelete}
+                          isActive={index === selectedPath.length - 1}
+                        />
+                        {index < selectedPath.length - 1 && (
+                          <span className="mx-1">{"->"}</span>
+                        )}
+                      </React.Fragment>
+                    ))
+                  : ""}
+              </span>
+              {/* Render the nested dropdown for the last item */}
+              <div className="absolute top-full left-0">
+                <NestedDropdown
+                  options={referenceOptions}
+                  onSelect={handleSelection}
+                  path={selectedPath}
+                  isActive={true}
+                />
+              </div>
+            </div>
+            <div className="ml-16 mb-8">
+              <VisibleMenu updateProp={updateProp} defaultVis={vis} />
+            </div>
           </div>
-        </div>
+        </>
       );
     },
   }

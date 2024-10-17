@@ -63,12 +63,8 @@ export const trackReferenceBlocks = (
   const processBlock = (block: any, depth: number, parentName?: string) => {
     if (!block) return;
 
-    // Process "bubble", "noparam", and "file" types
-    if (
-      block.type === "bubble" ||
-      block.type === "noparam" ||
-      block.type === "file"
-    ) {
+    // Process "bubble" and "file" types
+    if (block.type === "bubble" || block.type === "file") {
       // Increment the count for the block type
       blockCounts[block.type] += 1;
 
@@ -78,9 +74,7 @@ export const trackReferenceBlocks = (
       // Add the block to the collected references
       if (block.type == "file") {
         collectedReferences[blockName] = {
-          pages: { 1: "text", 2: "text" },
           text: "output",
-          images: "output",
         };
       } else {
         collectedReferences[blockName] = {
