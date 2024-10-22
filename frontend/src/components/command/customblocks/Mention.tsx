@@ -7,7 +7,7 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { FiX } from "react-icons/fi";
-import VisibleMenu from "./utils/visibilityMenu";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const NestedDropdown = ({
   options,
@@ -159,19 +159,14 @@ export const Mention = createReactBlockSpec(
         });
       };
 
-      const updateProp = (visible: boolean) => {
-        props.editor.updateBlock(props.block, {
-          type: "mention",
-          props: { vis: visible },
-        });
-      };
-
       return (
         <>
           <div className="inline-block relative flex items-center">
-            {/* Display the final selected path */}
             <div className="inline-block relative">
-              <span className="bg-purple-200 py-1 px-2 rounded-md">
+              <span className="bg-purple-200 py-1 px-2 rounded-md flex items-center gap-2">
+                <span className="flex items-center">
+                  {vis ? <FaEye /> : <FaEyeSlash />}
+                </span>
                 @
                 {selectedPath.length > 0
                   ? selectedPath.map((key, index) => (
@@ -200,9 +195,6 @@ export const Mention = createReactBlockSpec(
                   isActive={true}
                 />
               </div>
-            </div>
-            <div className="ml-16 mb-8">
-              <VisibleMenu updateProp={updateProp} defaultVis={vis} />
             </div>
           </div>
         </>

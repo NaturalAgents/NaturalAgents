@@ -1,6 +1,7 @@
 import { createReactBlockSpec } from "@blocknote/react";
 import { Badge } from "@/components/ui/badge";
-import VisibleMenu from "./utils/visibilityMenu";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+
 // Function to map color to classes
 const getColorClass = (color: string) => {
   switch (color) {
@@ -37,21 +38,17 @@ export const NoParam = createReactBlockSpec(
   },
   {
     render: (props) => {
-      const { text, color, vis } = props.block.props;
-
-      const updateProp = (visible: boolean) => {
-        props.editor.updateBlock(props.block, {
-          type: "noparam",
-          props: { vis: visible },
-        });
-      };
+      const { text, vis } = props.block.props;
       return (
         <>
           <span className="inline-block align-middle">
-            <Badge variant="outline" className={`bg-purple-500 text-white`}>
+            <Badge
+              variant="outline"
+              className={`bg-purple-500 text-whiteflex items-center text-md gap-2`}
+            >
+              <span>{vis ? <FaEye /> : <FaEyeSlash />}</span>
               {text}
             </Badge>
-            <VisibleMenu updateProp={updateProp} defaultVis={vis} />
           </span>
           <div className="inline-content"></div>
         </>

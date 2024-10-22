@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Session } from "@/services/session";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
-import VisibleMenu from "./utils/visibilityMenu";
+import { FaEye } from "react-icons/fa";
+import { FaEyeSlash } from "react-icons/fa";
 
 // Function to map color to classes
 const getColorClass = (color: string) => {
@@ -70,26 +71,17 @@ export const Bubble = createReactBlockSpec(
         setDisabled(true);
       };
 
-      const updateProp = (visible: boolean) => {
-        props.editor.updateBlock(props.block, {
-          type: "bubble",
-          props: { vis: visible },
-        });
-      };
-
       return (
         <Card className={`p-4 relative w-full`}>
           {/* Label with text */}
           <Label
             htmlFor="cardInput" // Associate label with input
-            className={`absolute -top-2 left-2 text-xs text-white bg-opacity-75 px-1 ${colorClass}`}
+            className={`absolute -top-2 left-2 text-xs text-white bg-opacity-75 px-1 ${colorClass} text-md flex items-center gap-2`}
           >
-            {text}
+            <span>{vis ? <FaEye /> : <FaEyeSlash />}</span> {text}
           </Label>
 
           {/* 3-dotted menu button in top-right */}
-
-          {!send && <VisibleMenu updateProp={updateProp} defaultVis={vis} />}
           <span className="text-sm underline">{prompt}</span>
 
           {send ? (

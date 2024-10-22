@@ -1,7 +1,15 @@
 "use client";
 
 import { BlockNoteEditor, filterSuggestionItems } from "@blocknote/core";
-import { SuggestionMenuController } from "@blocknote/react";
+import {
+  DragHandleButton,
+  DragHandleMenu,
+  RemoveBlockItem,
+  SideMenu,
+  SideMenuController,
+  SideMenuProps,
+  SuggestionMenuController,
+} from "@blocknote/react";
 import { BlockNoteView } from "@blocknote/mantine";
 import "@blocknote/mantine/style.css";
 
@@ -15,6 +23,7 @@ import {
   getMentionMenuItems,
   trackReferenceBlocks,
 } from "./customblocks/utils/commandEditorMenus";
+import { VisibleToggle } from "./customsidemenu/VisibilityToggle";
 
 const Editor = ({ selectedFile }: { selectedFile: FileEntry | null }) => {
   const [initialContent, setInitialContent] = useState<
@@ -65,12 +74,32 @@ const Editor = ({ selectedFile }: { selectedFile: FileEntry | null }) => {
               <BlockNoteView
                 editor={editor}
                 slashMenu={false}
+                sideMenu={false}
                 theme={"light"}
                 onChange={() => {
                   trackReferenceBlocks(editor, setReferenceOptions); // Track the blocks when document changes
                   setDocument(JSON.stringify(editor.document));
                 }}
               >
+                <SideMenuController
+                  sideMenu={(
+                    props: SideMenuProps<
+                      typeof schema.blockSchema,
+                      typeof schema.inlineContentSchema,
+                      typeof schema.styleSchema
+                    >
+                  ) => (
+                    <SideMenu
+                      {...props}
+                      dragHandleMenu={(props) => (
+                        <DragHandleMenu {...props}>
+                          <VisibleToggle {...props}>Output</VisibleToggle>
+                        </DragHandleMenu>
+                      )}
+                    ></SideMenu>
+                  )}
+                />
+
                 <SuggestionMenuController
                   triggerCharacter={"/"}
                   getItems={async (query) =>
