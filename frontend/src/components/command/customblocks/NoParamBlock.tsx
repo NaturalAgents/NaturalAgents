@@ -44,7 +44,7 @@ export const NoParam = createReactBlockSpec(
           <span className="inline-block align-middle">
             <Badge
               variant="outline"
-              className={`bg-purple-500 text-whiteflex items-center text-md gap-2`}
+              className={`bg-purple-500 text-black flex items-center text-md gap-2`}
             >
               <span>{vis ? <FaEye /> : <FaEyeSlash />}</span>
               {text}

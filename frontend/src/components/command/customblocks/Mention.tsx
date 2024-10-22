@@ -94,7 +94,7 @@ const NestComponent = ({
   };
 
   return (
-    <span className="inline-flex items-center bg-gray-200 py-1 px-2 mx-1 rounded-md cursor-pointer relative">
+    <span className="inline-flex items-center text-black text-md bg-gray-200 py-1 px-2 mx-1 rounded-md cursor-pointer relative">
       {/* NestComponent text */}
       <span onClick={handleToggleDropdown} className="mr-1">
         {nest}
@@ -163,7 +163,7 @@ export const Mention = createReactBlockSpec(
         <>
           <div className="inline-block relative flex items-center">
             <div className="inline-block relative">
-              <span className="bg-purple-200 py-1 px-2 rounded-md flex items-center gap-2">
+              <span className="bg-pink-400 py-1 px-2 rounded-md flex items-center gap-2">
                 <span className="flex items-center">
                   {vis ? <FaEye /> : <FaEyeSlash />}
                 </span>

@@ -6,6 +6,7 @@ import {
 } from "@blocknote/react";
 import { schema } from "../customschema/Schema";
 import { useEffect, useState } from "react";
+import { FaCheck } from "react-icons/fa";
 
 export function VisibleToggle(
   props: DragHandleMenuProps<typeof schema.blockSchema>
@@ -55,8 +56,9 @@ export function VisibleToggle(
       )}
 
       {!custom && (
-        <Components.Generic.Menu.Label>
+        <Components.Generic.Menu.Label className="flex items-center gap-2">
           Display output
+          <FaCheck size={10} />
         </Components.Generic.Menu.Label>
       )}
     </>

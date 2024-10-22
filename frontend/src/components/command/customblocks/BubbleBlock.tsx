@@ -76,7 +76,7 @@ export const Bubble = createReactBlockSpec(
           {/* Label with text */}
           <Label
             htmlFor="cardInput" // Associate label with input
-            className={`absolute -top-2 left-2 text-xs text-white bg-opacity-75 px-1 ${colorClass} text-md flex items-center gap-2`}
+            className={`absolute -top-2 left-2 text-xs text-black bg-opacity-75 px-1 ${colorClass} text-md flex items-center gap-2`}
           >
             <span>{vis ? <FaEye /> : <FaEyeSlash />}</span> {text}
           </Label>
