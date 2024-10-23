@@ -5,6 +5,10 @@ from events.tools import generate_image, text_generate, summarize, processPDF
 from events.PROMPTS import SUMMARY_PROMPT
 import asyncio 
 
+
+# This is a backend codebase
+
+
 ACTION_TYPES = {"<command>:generate", 
                 "<command>:image_generation", 
                 "<command>:summarize", 
