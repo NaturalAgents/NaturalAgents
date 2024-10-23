@@ -29,6 +29,7 @@ class Run:
 
 
     def process_plan(self, editor_content):
+        # manage references here
         vertical_bubbles = []
 
         def search_bubbles(content):
