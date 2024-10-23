@@ -139,23 +139,28 @@ export default function PlaygroundPage() {
 
           <Separator />
 
-          <ResizablePanelGroup direction="horizontal">
-            <ResizablePanel>
+          <div className="relative h-full">
+            <div className={`h-full ${isSideViewOpen ? 'hidden md:block' : 'block'}`}>
               <Editor selectedFile={selectedFile} />
-            </ResizablePanel>
-
+              {!isSideViewOpen && (
+                <Button
+                  className="absolute top-4 right-4 bg-blue-600"
+                  onClick={() => setIsSideViewOpen(true)}
+                >
+                  Expand Output
+                </Button>
+              )}
+            </div>
             {isSideViewOpen && (
-              <div className="border border-gray-300 w-1/2 h-screen overflow-y-scroll	bg-white">
-                <ResizablePanel>
-                  <OutputRender
-                    handleCloseSideView={handleCloseSideView}
-                    preview={preview}
-                    selectedFile={selectedFile}
-                  />
-                </ResizablePanel>
+              <div className={`absolute top-0 left-0 w-full h-full bg-white transition-transform duration-300 ease-in-out ${isSideViewOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+                <OutputRender
+                  handleCloseSideView={handleCloseSideView}
+                  preview={preview}
+                  selectedFile={selectedFile}
+                />
               </div>
             )}
-          </ResizablePanelGroup>
+          </div>
         </div>
       </div>
     </div>
