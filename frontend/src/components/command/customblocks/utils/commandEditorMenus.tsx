@@ -75,16 +75,30 @@ export const trackReferenceBlocks = (
   };
 
   // Recursive function to process blocks and their children
-  const processBlock = (block: any, parentBlockID: string, depth: number) => {
+  const processBlock = (
+    block: typeof schema.Block,
+    parentBlockID: string,
+    depth: number
+  ) => {
     if (!block) return;
 
     // Process "bubble" and "file" types
-    if (block.type === "bubble" || block.type === "file") {
+    if (
+      block.type === "bubble" ||
+      block.type === "file" ||
+      block.type === "noparam"
+    ) {
       // Increment the count for the block type
       blockCounts[block.type] += 1;
 
       // Create the block name, with parentName if the block is nested
-      const blockName = `name: ${block.type} ${
+
+      let refName: string = block.type;
+      if (block.type == "noparam") {
+        refName = block.props.text;
+      }
+
+      const blockName = `name: ${refName} ${
         blockCounts[block.type]
       } blockID: ${parentBlockID} nodeID: ${block.id}`;
 
