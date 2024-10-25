@@ -1,9 +1,9 @@
 class ShortTermMemory:
-    def __init__(self):
-        self.history = []
+    def __init__(self, history=[]):
+        self.history = history
 
 
-    def queue_history(self, content, role, command, visible=True, image=False):
+    def queue_history(self, content, role, command, node_id, visible=True, image=False):
         historical_content = []
         
         if image:
@@ -18,9 +18,7 @@ class ShortTermMemory:
                 "text": content
             }
         historical_content.append(content_info)
-
-
-        self.history.append({"content": historical_content, "role": role, "command": command, "visible": visible})
+        self.history.append({"content": historical_content, "role": role, "command": command, "visible": visible, "id": node_id})
 
 
     def get_history(self, get_vis=False):
