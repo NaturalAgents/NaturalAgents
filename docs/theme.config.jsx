@@ -10,6 +10,7 @@ export default {
   project: {
     link: "https://github.com/NaturalAgents/NaturalAgents",
   },
+  docsRepositoryBase: "https://github.com/NaturalAgents/NaturalAgents",
   nav: [
     {
       name: "Home",
@@ -25,6 +26,20 @@ export default {
       <div className="ml-4">
         <ThemeSwitch />
       </div>
+    ),
+  },
+  darkMode: false, // Disables dark mode toggle globally
+  editLink: {
+    content: null, // Removes the "Edit this page" link
+  },
+  footer: {
+    content: (
+      <span>
+        Copyright © {new Date().getFullYear()}{" "}
+        <a href="https://nextra.site" target="_blank">
+          NaturalAgents
+        </a>
+      </span>
     ),
   },
 };
