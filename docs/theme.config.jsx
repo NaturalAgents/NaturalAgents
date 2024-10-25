@@ -11,16 +11,6 @@ export default {
     link: "https://github.com/NaturalAgents/NaturalAgents",
   },
   docsRepositoryBase: "https://github.com/NaturalAgents/NaturalAgents",
-  nav: [
-    {
-      name: "Home",
-      href: "/", // Links to the landing page
-    },
-    {
-      name: "Docs",
-      href: "/docs", // Links to the docs section
-    },
-  ],
   navbar: {
     extraContent: () => (
       <div className="ml-4">
