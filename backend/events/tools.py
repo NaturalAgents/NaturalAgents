@@ -27,8 +27,6 @@ def text_generate(prompt, system=None, model="gpt-4o", history=[]):
     msg_history = history.copy()
     messages = []
     
-    print("history", msg_history)
-
     # Including all previous history; possibly a better idea to perform RAG for the necessary context?
     for msg in msg_history:
         messages.append(msg)

@@ -27,18 +27,33 @@ export const getMentionMenuItems = (
 ): DefaultReactSuggestionItem[] => {
   const levelOne = Object.keys(referenceOptions);
 
-  return levelOne.map((key) => ({
-    title: key,
-    onItemClick: () => {
-      insertOrUpdateBlock(editor, {
-        type: "mention",
-        props: {
-          object: JSON.stringify(referenceOptions[key]),
-          parentKey: key,
-        },
-      });
-    },
-  }));
+  return levelOne.map((key) => {
+    const nameMatch = key.match(/name:\s(.+?)\sblockID:/);
+    const name = nameMatch ? nameMatch[1].trim() : "";
+
+    const blockIDMatch = key.match(/blockID:\s([^\s]+)/);
+    const nodeIDMatch = key.match(/nodeID:\s([^\s]+)/);
+
+    const blockID = blockIDMatch ? blockIDMatch[1].trim() : "";
+    const nodeID = nodeIDMatch ? nodeIDMatch[1].trim() : "";
+
+    console.log(blockID, nodeID);
+
+    return {
+      title: name,
+      onItemClick: () => {
+        insertOrUpdateBlock(editor, {
+          type: "mention",
+          props: {
+            object: JSON.stringify(referenceOptions[key]),
+            parentKey: name,
+            blockID,
+            nodeID,
+          },
+        });
+      },
+    };
+  });
 };
 
 export const trackReferenceBlocks = (
@@ -60,7 +75,7 @@ export const trackReferenceBlocks = (
   };
 
   // Recursive function to process blocks and their children
-  const processBlock = (block: any, depth: number, parentName?: string) => {
+  const processBlock = (block: any, parentBlockID: string, depth: number) => {
     if (!block) return;
 
     // Process "bubble" and "file" types
@@ -69,7 +84,9 @@ export const trackReferenceBlocks = (
       blockCounts[block.type] += 1;
 
       // Create the block name, with parentName if the block is nested
-      const blockName = `${block.type} ${blockCounts[block.type]}`;
+      const blockName = `name: ${block.type} ${
+        blockCounts[block.type]
+      } blockID: ${parentBlockID} nodeID: ${block.id}`;
 
       // Add the block to the collected references
       if (block.type == "file") {
@@ -85,7 +102,7 @@ export const trackReferenceBlocks = (
       // Recursively process any children of the block
       if (block.children) {
         block.children.forEach((child: any) =>
-          processBlock(child, depth + 1, blockName)
+          processBlock(child, parentBlockID, depth + 1)
         );
       }
     }
@@ -98,7 +115,7 @@ export const trackReferenceBlocks = (
     }
 
     // Process the block at depth 0 (top level)
-    processBlock(block, 0);
+    processBlock(block, block.id, 0);
   }
 
   setReferenceOptions(collectedReferences); // Update the referenceOptions object

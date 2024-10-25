@@ -132,6 +132,12 @@ export const Mention = createReactBlockSpec(
       parentKey: {
         default: "",
       },
+      blockID: {
+        default: "",
+      },
+      nodeID: {
+        default: "",
+      },
       vis: {
         default: true,
         values: [true, false],
@@ -142,7 +148,6 @@ export const Mention = createReactBlockSpec(
   {
     render: (props) => {
       const { object, parentKey, vis } = props.block.props;
-
       const referenceOptions = JSON.parse(object);
       const [selectedPath, setSelectedPath] = useState([parentKey]);
 
