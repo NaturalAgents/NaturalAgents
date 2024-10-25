@@ -45,7 +45,7 @@ class BlockHolds:
     def retrieve_mention(self, blockID, nodeID):
         def find_node(node: BlockNode):
             if nodeID == node.id:
-                return node.retrieve_mention(nodeID)
+                return node.retrieve_mention()
             
             for child in node.children:
                 find_node(child)

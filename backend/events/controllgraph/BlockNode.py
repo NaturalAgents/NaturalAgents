@@ -27,8 +27,8 @@ class BlockNode:
         self.memory = ShortTermMemory(history=history, indexed_history=indexed_history)
 
 
-    def retrieve_mention(self, nodeID):
-        if nodeID in self.memory.indexed_history:
-            return self.memory.indexed_history[nodeID]
+    def retrieve_mention(self):
+        if self.processor.output is not None:
+            return self.processor.output
 
         return None

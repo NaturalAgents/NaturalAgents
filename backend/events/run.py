@@ -1,4 +1,5 @@
 import json
+from events.commands.mention import Mention
 from events.controllgraph.BlockHolds import BlockHolds
 from events.controllgraph.BlockNode import BlockNode
 from events.commands.file import File
@@ -72,38 +73,35 @@ class Run:
     async def dfs(self, node: BlockNode, parent_history, indexed_parent_history, websocket):
         node.initialize_memory(history=parent_history, indexed_history=indexed_parent_history)
         history = node.memory.get_history()
+        process = True
 
         if node.node_type == "<command>:generate":
             node.processor = Generate(websocket, node)
-            await node.processor.process()
 
         elif node.node_type == "<command>:image_generation":
             node.processor = GenerateImage(websocket, node)
-            await node.processor.process()
 
         elif node.node_type == "<command>:summarize":
             node.processor = Summarize(websocket, node)
-            await node.processor.process()
 
         elif node.node_type == "<command>:userinput":
             node.processor = UserInput(websocket, node, self)
-            await node.processor.process()
 
         elif node.node_type == "file":
             node.processor = File(websocket, node, self)
-            await node.processor.process()
             
         elif node.node_type == "paragraph":
             node.processor = Paragraph(websocket, node)
-            await node.processor.process()
 
-        # elif node.node_type == "mention":
-        #     if node.mention != None:
-        #         value = self.blockholds.retrieve_mention(node.mention[0], node.mention[1])
-        #         if node.vis:
-        #             await self.emit(websocket, {"output": json.dumps(value)})
+        elif node.node_type == "mention":
+            node.processor = Mention(websocket, node, self.blockholds)
         else:
             await self.emit(websocket, {"output": "command is not supported"})
+            process = False
+
+        if process:
+            await node.processor.process()
+
 
         history = node.memory.get_history()
         for child in node.children:
