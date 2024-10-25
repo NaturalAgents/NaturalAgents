@@ -1,6 +1,10 @@
 import json
 from typing import List
+from events.commands.paragraph import Paragraph
+from events.commands.summarize import Summarize
 from memory.history import ShortTermMemory
+from events.commands.generate import Generate
+from events.commands.generateimage import GenerateImage
 from events.tools import generate_image, text_generate, summarize, processPDF
 from events.PROMPTS import SUMMARY_PROMPT
 import asyncio 
@@ -26,6 +30,7 @@ class BlockNode:
         self.mention = None
         self.incoming = []
         self.memory = None
+        self.processor = None
 
     def add_child(self, child: 'BlockNode'):
         self.children.append(child)
@@ -36,11 +41,16 @@ class BlockNode:
             self.mention = (graph_id, node_id)
 
 
-    def initialize_memory(self, history=[]):
-        self.memory = ShortTermMemory(history=history)
+    def initialize_memory(self, history=[], indexed_history={}):
+        self.memory = ShortTermMemory(history=history, indexed_history=indexed_history)
 
 
-    
+    def retrieve_mention(self, nodeID):
+        if nodeID in self.memory.indexed_history:
+            return self.memory.indexed_history[nodeID]
+
+        return None
+
 class BlockHolds:
     def __init__(self):
         self.blocks = {}
@@ -82,6 +92,19 @@ class BlockHolds:
 
         print("\nVisualization complete.")
 
+    def retrieve_mention(self, blockID, nodeID):
+        def find_node(node: BlockNode):
+            if nodeID == node.id:
+                return node.retrieve_mention(nodeID)
+            
+            for child in node.children:
+                find_node(child)
+            
+        if blockID in self.blocks:
+            return find_node(self.blocks[blockID])
+
+        return None
+
 
 class Run:
     state: str
@@ -105,7 +128,8 @@ class Run:
             elif item['type'] == 'file':
                 node = BlockNode(id=id, node_type=item["type"], file_type=item["props"]["fileType"], vis=item["props"]["vis"])
             elif item['type'] == 'mention':
-                node = BlockNode(id=id, node_type='paragraph', prompt="mention node")
+                node = BlockNode(id=id, node_type=item["type"], vis=item["props"]["vis"])
+                node.add_mention(item["props"]["blockID"], item["props"]["nodeID"])
             else:
                 content = item["content"][0]["text"] if item["content"] else ""
                 node = BlockNode(id=id, node_type='paragraph', prompt=content)
@@ -131,24 +155,27 @@ class Run:
     async def emit(self, websocket, msg):
         await websocket.send_json(msg)
 
-    async def dfs(self, node: BlockNode, parent_history, websocket):
-        node.initialize_memory(history=parent_history)
+    async def dfs(self, node: BlockNode, parent_history, indexed_parent_history, websocket):
+        node.initialize_memory(history=parent_history, indexed_history=indexed_parent_history)
         history = node.memory.get_history()
         image = False
         skip_response = False
 
         if node.node_type == "<command>:generate":
-            response = text_generate(node.prompt, history=history)
-            node.memory.queue_history(node.prompt, "user", node.node_type, node.id, visible=node.vis)
+            node.processor = Generate(websocket, node)
+            await node.processor.process()
+            skip_response = True
+
 
         elif node.node_type == "<command>:image_generation":
-            image = True
-            response = generate_image(node.prompt)
-            node.memory.queue_history(node.prompt, "user", node.node_type, node.id, visible=node.vis, image=True)
+            node.processor = GenerateImage(websocket, node)
+            await node.processor.process()
+            skip_response = True
 
         elif node.node_type == "<command>:summarize":
-            response = summarize(history=history)
-            node.memory.queue_history(SUMMARY_PROMPT, "user", node.node_type, node.id, visible=node.vis)
+            node.processor = Summarize(websocket, node)
+            await node.processor.process()
+            skip_response = True
 
         elif node.node_type == "<command>:userinput":
             self.state = "pending"
@@ -184,7 +211,16 @@ class Run:
                 skip_response = True
             
         elif node.node_type == "paragraph":
-            await self.emit(websocket, {"output": node.prompt})
+            node.processor = Paragraph(websocket, node)
+            await node.processor.process()
+            skip_response = True
+
+        elif node.node_type == "mention":
+            if node.mention != None:
+                value = self.blockholds.retrieve_mention(node.mention[0], node.mention[1])
+                if node.vis:
+                    await self.emit(websocket, {"output": json.dumps(value)})
+
             skip_response = True
 
         else:
@@ -201,7 +237,7 @@ class Run:
 
         history = node.memory.get_history()
         for child in node.children:
-            await self.dfs(child, history, websocket)
+            await self.dfs(child, history, node.memory.indexed_history, websocket)
 
 
     async def run(self, payload, websocket):
@@ -215,45 +251,10 @@ class Run:
         num_blocks = self.blockholds.get_num_blocks()
         for i in range(num_blocks):
             block = self.blockholds.get_block(i)
-            await self.dfs(block, [], websocket)
+            await self.dfs(block, [], {}, websocket)
 
         await websocket.send_json({"finished": True})
            
-                
-    #             elif item_type == "file":
-    #                 file_type = item["fileType"]
-
-
-    #                 if file_type == "PDF":
-    #                     self.state = "pending"
-
-    #                     await websocket.send_json({"request": "file", "type": file_type})
-    #                     user_input = await self.user_input_future
-                        
-    #                     self.state = "running"
-    #                     self.user_inputs.append(user_input)
-                        
-    #                     # extract pdf text and add to history
-    #                     text = processPDF(user_input)
-    #                     info_request = "User uploaded {} with the following content\n\n{}".format(file_type, text)
-    #                     self.memory.add_node_history(info_request, "user", item_type)
-                        
-    #                     self.user_input_future = asyncio.Future()
-    #                     continue
-
-    #             else:
-    #                 response = "command is not supported"
-
-    #             self.memory.add_node_history(response, "assistant", item_type, visible=vis, image=image)
-
-
-        
-    #     output = self.memory.markdown_response()
-    #     self.state = "finished"
-    #     await websocket.send_json({"output": output})
-    #     await websocket.send_json({"finished": True})
-
-        
 
     def set_user_info(self, user_info):
         loop = asyncio.get_running_loop()

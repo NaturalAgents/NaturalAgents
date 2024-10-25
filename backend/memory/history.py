@@ -1,6 +1,7 @@
 class ShortTermMemory:
-    def __init__(self, history=[]):
+    def __init__(self, history=[], indexed_history={}):
         self.history = history
+        self.indexed_history = indexed_history
 
 
     def queue_history(self, content, role, command, node_id, visible=True, image=False):
@@ -18,8 +19,12 @@ class ShortTermMemory:
                 "text": content
             }
         historical_content.append(content_info)
-        self.history.append({"content": historical_content, "role": role, "command": command, "visible": visible, "id": node_id})
-
+        new_log = {"content": historical_content, "role": role, "command": command, "visible": visible, "id": node_id}
+        self.history.append(new_log)
+        if node_id not in self.indexed_history:
+            self.indexed_history[node_id] = [new_log]
+        else:
+            self.indexed_history[node_id].append(new_log)
 
     def get_history(self, get_vis=False):
         history = self.history
