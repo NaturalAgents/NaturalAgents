@@ -36,6 +36,7 @@ class Generate:
     async def process(self):
         node = self.node
         history = node.memory.get_history()
+        self.input = node.prompt
         response = self.text_generate(node.prompt, history=history)
         self.output = response
         node.memory.queue_history(node.prompt, "user", node.node_type, node.id, visible=node.vis)

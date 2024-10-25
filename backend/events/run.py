@@ -1,12 +1,12 @@
 import json
-from typing import List
+from events.controllgraph.BlockHolds import BlockHolds
+from events.controllgraph.BlockNode import BlockNode
+from events.commands.file import File
+from events.commands.userinput import UserInput
 from events.commands.paragraph import Paragraph
 from events.commands.summarize import Summarize
-from memory.history import ShortTermMemory
 from events.commands.generate import Generate
 from events.commands.generateimage import GenerateImage
-from events.tools import generate_image, text_generate, summarize, processPDF
-from events.PROMPTS import SUMMARY_PROMPT
 import asyncio 
 
 
@@ -19,99 +19,13 @@ ACTION_TYPES = {"<command>:generate",
                 "paragraph"}
 
 
-class BlockNode:
-    def __init__(self, id: str, node_type: str, prompt: str = None, file_type: str = None, vis: bool = False):
-        self.id = id
-        self.node_type = node_type  # type of the node (e.g., <command>:generate)
-        self.prompt = prompt  # prompt text for certain types of nodes
-        self.file_type = file_type  # fileType for file nodes
-        self.vis = vis  # visibility
-        self.children = []
-        self.mention = None
-        self.incoming = []
-        self.memory = None
-        self.processor = None
-
-    def add_child(self, child: 'BlockNode'):
-        self.children.append(child)
-
-
-    def add_mention(self, graph_id: str, node_id: str):
-        if self.node_type == "mention":
-            self.mention = (graph_id, node_id)
-
-
-    def initialize_memory(self, history=[], indexed_history={}):
-        self.memory = ShortTermMemory(history=history, indexed_history=indexed_history)
-
-
-    def retrieve_mention(self, nodeID):
-        if nodeID in self.memory.indexed_history:
-            return self.memory.indexed_history[nodeID]
-
-        return None
-
-class BlockHolds:
-    def __init__(self):
-        self.blocks = {}
-        self.order = {}
-        self.mention_exists = {}
-        self.memory = {}
-
-    def add_node(self, order, node_id, node: BlockNode):
-        self.order[order] = node_id
-        self.blocks[node_id] = node
-        self.mention_exists[node_id] = False
-
-    def get_num_blocks(self):
-        return len(self.order.keys())
-    
-    def get_block(self, order_num):
-        if order_num in self.order:
-            graph_id = self.order[order_num]
-            return self.blocks[graph_id]
-        return None
-
-    def visualize_node(self, node: BlockNode, depth: int = 0):
-        """ Recursively visualize a node and its children. """    
-        indent = "    " * depth  # Indent for tree structure
-        print(f"{indent}- Node ID: {node.id}, Type: {node.node_type}, Prompt: {node.prompt}")
-
-        for child in node.children:
-            self.visualize_node(child, depth + 1)
-
-
-    def visualize_all(self):
-        """ Visualize all nodes in BlockHolds by iterating through the root nodes. """
-        print("\nVisualizing BlockHolds...\n")
-        for count, node_id in enumerate(self.blocks):
-            node = self.blocks[node_id]
-            print(f"Block {count + 1}")
-            self.visualize_node(node, 0)
-            print("\n")
-
-        print("\nVisualization complete.")
-
-    def retrieve_mention(self, blockID, nodeID):
-        def find_node(node: BlockNode):
-            if nodeID == node.id:
-                return node.retrieve_mention(nodeID)
-            
-            for child in node.children:
-                find_node(child)
-            
-        if blockID in self.blocks:
-            return find_node(self.blocks[blockID])
-
-        return None
-
 
 class Run:
     state: str
     sid: str
-    user_inputs: List[str]
+    user_inputs: list[str]
     user_input_future = asyncio.Future()
-
+    future_registry: dict[str, asyncio.Future] = {}
 
     def __init__(self, sid):
         self.blockholds = BlockHolds()
@@ -158,82 +72,38 @@ class Run:
     async def dfs(self, node: BlockNode, parent_history, indexed_parent_history, websocket):
         node.initialize_memory(history=parent_history, indexed_history=indexed_parent_history)
         history = node.memory.get_history()
-        image = False
-        skip_response = False
 
         if node.node_type == "<command>:generate":
             node.processor = Generate(websocket, node)
             await node.processor.process()
-            skip_response = True
-
 
         elif node.node_type == "<command>:image_generation":
             node.processor = GenerateImage(websocket, node)
             await node.processor.process()
-            skip_response = True
 
         elif node.node_type == "<command>:summarize":
             node.processor = Summarize(websocket, node)
             await node.processor.process()
-            skip_response = True
 
         elif node.node_type == "<command>:userinput":
-            self.state = "pending"
-            
-            await websocket.send_json({"request": "userinput", "msg": node.prompt})
-            user_input = await self.user_input_future
-
-            self.state = "running"
-            info_request = "Information requested from user: {}\n\nUser response: {}".format(node.prompt, user_input)
-            node.memory.queue_history(info_request, "user", node.node_type, node.id, visible=node.vis)
-            self.user_input_future = asyncio.Future()
-            skip_response = True
+            node.processor = UserInput(websocket, node, self)
+            await node.processor.process()
 
         elif node.node_type == "file":
-            file_type = node.file_type
-
-
-            if file_type == "PDF":
-                self.state = "pending"
-
-                await websocket.send_json({"request": "file", "type": file_type})
-                user_input = await self.user_input_future
-                
-                self.state = "running"
-                
-                # extract pdf text and add to history
-                text = processPDF(user_input)
-                info_request = "User uploaded {} with the following content\n\n{}".format(file_type, text)
-                node.memory.queue_history(info_request, "user", node.node_type, node.id, visible=node.vis)
-
-                
-                self.user_input_future = asyncio.Future()
-                skip_response = True
+            node.processor = File(websocket, node, self)
+            await node.processor.process()
             
         elif node.node_type == "paragraph":
             node.processor = Paragraph(websocket, node)
             await node.processor.process()
-            skip_response = True
 
-        elif node.node_type == "mention":
-            if node.mention != None:
-                value = self.blockholds.retrieve_mention(node.mention[0], node.mention[1])
-                if node.vis:
-                    await self.emit(websocket, {"output": json.dumps(value)})
-
-            skip_response = True
-
+        # elif node.node_type == "mention":
+        #     if node.mention != None:
+        #         value = self.blockholds.retrieve_mention(node.mention[0], node.mention[1])
+        #         if node.vis:
+        #             await self.emit(websocket, {"output": json.dumps(value)})
         else:
-            response = "command is not supported"
-
-
-        if not skip_response:
-            node.memory.queue_history(response, "assistant", node.node_type, node.id, visible=node.vis, image=image)
-            if (node.vis):
-                if image:
-                    await self.emit(websocket, {"output": f"![generated image]({response})"})
-                else:
-                    await self.emit(websocket, {"output": response})
+            await self.emit(websocket, {"output": "command is not supported"})
 
         history = node.memory.get_history()
         for child in node.children:
@@ -256,9 +126,17 @@ class Run:
         await websocket.send_json({"finished": True})
            
 
+    def register_future(self, identifier: str, future: asyncio.Future):
+        """Registers a future to be fulfilled by a message."""
+        self.future_registry[identifier] = future
+
+
+
     def set_user_info(self, user_info):
-        loop = asyncio.get_running_loop()
-        loop.call_soon_threadsafe(self.user_input_future.set_result, user_info["msg"])
+        for i in self.future_registry:
+            self.future_registry[i].set_result(user_info["msg"])
+
+        self.future_registry.clear()
 
 
 if __name__ == "__main__":

@@ -22,6 +22,7 @@ class GenerateImage:
         node = self.node
         self.input = node.prompt
         image = self.generate_image(node.prompt)
+        self.output = image
         node.memory.queue_history(node.prompt, "user", node.node_type, node.id, visible=node.vis, image=True)
         node.memory.queue_history(image, "assistant", node.node_type, node.id, visible=node.vis, image=True)
 
