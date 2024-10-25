@@ -58,17 +58,15 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          path: |
-            docs
           node-version: "20"
           cache: ${{ steps.detect-package-manager.outputs.manager }}
+        working-directory: docs
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
         with:
-          path: |
-            docs
           static_site_generator: next
+        working-directory: docs
 
       - name: Restore cache
         uses: actions/cache@v4
