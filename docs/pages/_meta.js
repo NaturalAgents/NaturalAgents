@@ -7,11 +7,14 @@ export default {
     title: "Learn",
     type: "page",
   },
-  examples: {
-    title: "Examples",
+  showcase: {
+    title: "Showcase",
     type: "page",
     theme: {
-      layout: "raw",
+      breadcrumb: false,
+      sidebar: false,
+      toc: false,
+      pagination: false,
     },
   },
   reference: {

@@ -1,0 +1,58 @@
+import Image from "next/image";
+import prefix from "../../../lib/config";
+import startrecipe_im from "./images";
+import { Callout } from "nextra/components";
+
+# Create Recipes
+
+This a walkthrough on how to setup an emtpy recipe file in your workspace.
+
+## Create a file
+
+Click the file icon to create a new recipe file
+
+<Image
+  src={`${prefix}/learn/startrecipe.png`}
+  alt="Create recipe image"
+  width={1000}
+  height={500}
+/>
+
+Assign a name for the recipe file
+
+<Image
+  src={`${prefix}/learn/name.png`}
+  alt="Name recipe image"
+  width={1000}
+  height={500}
+/>
+
+## Assign a recipe title
+
+When a recipe is created, by default the title is "Untitled". You can assign a more readable title instead.
+
+<video
+  className="w-full"
+  controls
+  autoPlay
+  muted
+  loop
+  src={`${prefix}/learn/recipetitle.mov`}
+  type="video/mp4"
+></video>
+
+## Save the file
+
+<Callout type="info" emoji="ℹ️">
+  We are working on adding auto-saving, and manual saving expectations will be
+  removed.
+</Callout>
+
+Don't forget to save your changes!
+
+<Image
+  src={`${prefix}/learn/save.png`}
+  alt="Name recipe image"
+  width={1000}
+  height={500}
+/>

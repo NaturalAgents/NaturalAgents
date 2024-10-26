@@ -5,9 +5,9 @@ export default {
   installation: {
     title: "Installation",
   },
-  getstarted: {
-    title: "Get Started",
-  },
+  //   getstarted: {
+  //     title: "Get Started",
+  //   },
   guide: "Guide",
   macroseperator: {
     title: "More",
