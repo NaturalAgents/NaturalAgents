@@ -1,4 +1,5 @@
 import Image from 'next/image'
+import prefix from '../lib/config';
 
 <div className="flex flex-col items-center justify-center text-center">
     <h1 className="text-6xl font-bold mt-8">NaturalAgents</h1>
@@ -10,7 +11,7 @@ import Image from 'next/image'
         autoPlay
         muted
         loop
-        src="/static/videos/NaturalAgents Demo.mp4"
+        src={`${prefix}/static/videos/NaturalAgents Demo.mp4`}
         type="video/mp4"
         >
         </video>
@@ -44,7 +45,7 @@ import Image from 'next/image'
       style={{background: "linear-gradient(135deg, #ff4f00, #ee0024, #850056, #00519c)"}}
     >
       <Image
-        src="/static/images/github-mark-white.svg"
+        src={`${prefix}/static/images/github-mark-white.svg`}
         alt="GitHub"
         width={10}
         height={10}

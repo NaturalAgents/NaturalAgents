@@ -1,9 +1,11 @@
+import Image from "next/image";
 import { ThemeSwitch } from "nextra-theme-docs";
+import prefix from "./lib/config";
 
 export default {
   logo: (
     <div className="flex items-center space-x-4">
-      <img src="/static/images/logo.svg" width={40} height={40} />
+      <Image src={`${prefix}/static/images/logo.svg`} width={40} height={40} />
       <span className="font-bold">NaturalAgents</span>
     </div>
   ),

@@ -7,6 +7,7 @@ node_modules
 # Vercel build output
 .vercel
 **/.next
+**/out/
 
 # Python bytecode files
 *.pyc
