@@ -34,4 +34,19 @@ export default {
       </span>
     ),
   },
+  head: ({ title, meta }) => {
+    const pageTitle = "NaturalAgents";
+    return (
+      <>
+        <title>{pageTitle}</title>
+        <meta
+          name="description"
+          content={meta?.description || "Default description for NaturalAgents"}
+        />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="icon" href={`${prefix}/static/images/logo.ico`} />{" "}
+      </>
+    );
+  },
+  defaultShowCopyCode: true,
 };
