@@ -1,3 +1,5 @@
+import Image from 'next/image'
+
 <div className="flex flex-col items-center justify-center text-center">
     <h1 className="text-6xl font-bold mt-8">NaturalAgents</h1>
     <p className="text-lg">Anyone can build agents!</p>
@@ -41,9 +43,11 @@
       className="inline-flex flex-row items-center px-6 py-3 text-white font-semibold rounded-lg transition hover:opacity-90"
       style={{background: "linear-gradient(135deg, #ff4f00, #ee0024, #850056, #00519c)"}}
     >
-      <img
+      <Image
         src="/static/images/github-mark-white.svg"
         alt="GitHub"
+        width={10}
+        height={10}
         className="w-5 h-5 mr-2"
       />
       <span>Join us on GitHub!</span>
