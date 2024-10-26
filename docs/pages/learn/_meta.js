@@ -1,4 +1,5 @@
 import { FaExternalLinkAlt } from "react-icons/fa"; // Import an icon from React Icons
+import prefix from "../../lib/config";
 
 export default {
   installation: {
@@ -18,8 +19,8 @@ export default {
         Example Recipes <FaExternalLinkAlt className="ml-2 mt-1" />
       </>
     ),
-    href: "/examples/explore",
-    newWindow: true,
+    href: "/examples",
+    newWindow: false,
   },
   macro_link: {
     title: (
@@ -27,7 +28,7 @@ export default {
         Macro List <FaExternalLinkAlt className="ml-2 mt-1" />
       </>
     ),
-    href: "/reference/MacroReference",
-    newWindow: true,
+    href: "/reference/intro",
+    newWindow: false,
   },
 };
