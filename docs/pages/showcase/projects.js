@@ -7,13 +7,13 @@ const galleryItems = [
     title: "PDF Summarizer",
     description: "Description for Item 1",
     imageUrl: "/images/item1.jpg",
-    slug: "/pdfsummary",
+    slug: "pdfsummary",
   },
   {
     id: 2,
     title: "PDF Question Assistant",
     description: "Description for Item 2",
-    imageUrl: "/pdfassistant",
+    imageUrl: "pdfassistant",
   },
 ];
 
