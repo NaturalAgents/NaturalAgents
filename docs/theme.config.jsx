@@ -28,7 +28,7 @@ export default {
     content: (
       <span>
         Copyright © {new Date().getFullYear()}{" "}
-        <a href="https://nextra.site" target="_blank">
+        <a href="https://naturalagents.github.io/NaturalAgents" target="_blank">
           NaturalAgents
         </a>
       </span>
