@@ -1,0 +1,39 @@
+import Image from "next/image";
+import prefix from "../../../lib/config";
+
+# Add Macros
+
+Macros are how you build agent logic.
+
+## Open macro list
+
+Pressing `/` opens the macro dropdown list.
+
+<Image
+  src={`${prefix}/learn/macromenu.png`}
+  alt="Create recipe image"
+  width={1000}
+  height={500}
+/>
+
+## Select macro
+
+Click the macro in the dropdown list necessary for the task. For example, we've selected the generated macro.
+
+<Image
+  src={`${prefix}/learn/macrosample.png`}
+  alt="Create recipe image"
+  width={1000}
+  height={500}
+/>
+
+## Add instructions
+
+For some macros, you can define how they behave. The `generate` macro asks an LLM provider (e.g GPT, Claude, etc) to fulfill tasks. This macro is similar to prompting GPT.
+
+<Image
+  src={`${prefix}/learn/macrosampleinstruction.png`}
+  alt="Create recipe image"
+  width={1000}
+  height={500}
+/>

@@ -1,0 +1,44 @@
+import Image from "next/image";
+import prefix from "../../../lib/config";
+
+# Run recipes
+
+Once you've finished adding macros to your recipe file, you're ready to run it.
+
+## Click the run button
+
+Click the "Run" button in the top right corner
+
+<Image
+  src={`${prefix}/learn/runbutton.png`}
+  alt="Run recipe button image"
+  width={1000}
+  height={500}
+/>
+
+## View output pane
+
+View the recipe outputs in the "Results" pane
+
+<div className="flex gap-4 flex-wrap">
+  <div className="w-full text-center">
+    <Image
+      src={`${prefix}/learn/macrosampleinstruction.png`}
+      alt="Create recipe image"
+      width={1000}
+      height={500}
+      className="object-contain"
+    />
+    <p className="mt-2">Original recipe</p>
+  </div>
+  <div className="w-full text-center">
+    <Image
+      src={`${prefix}/learn/resultpane.png`}
+      alt="Create recipe image"
+      width={1000}
+      height={500}
+      className="object-contain"
+    />
+    <p className="mt-2">Recipe run outputs</p>
+  </div>
+</div>

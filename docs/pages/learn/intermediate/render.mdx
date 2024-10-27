@@ -1,0 +1,246 @@
+import Image from "next/image";
+import prefix from "../../../lib/config";
+
+# Control Outputs
+
+We provide ways to control which macros in a recipe file should have their outputs displayed. Also, we have a "preview" pane that assists in demonstrating what the final recipe outputs will like.
+
+## Preview
+
+To get a quick preview of what the output would look like, consult the "preview pane". Click the following button in the top right corner
+
+<Image
+  src={`${prefix}/learn/previewbutton.png`}
+  alt="Create recipe image"
+  width={1000}
+  height={500}
+/>
+
+Here is a sample recipe
+
+<Image
+  src={`${prefix}/learn/previewrecipe.png`}
+  alt="Create recipe image"
+  width={1000}
+  height={500}
+/>
+
+The preview for this recipe looks like the following
+
+<Image
+  src={`${prefix}/learn/preview.png`}
+  alt="Create recipe image"
+  width={1000}
+  height={500}
+/>
+
+We haven't run the recipe yet. The preview only shows what outputs to expect in advance. Notice that any plain text you write will be preserved in the final outputs.
+
+## Toggle Display Output
+
+Clicking the drag handle, on the left side of the editor, opens a dropdown of configurable options. Clicking "Display Output" controls whether the output is displayed. In this example there is a check mark, which means it will be shown in the final outputs.
+
+<Image
+  src={`${prefix}/learn/previewtoggle.png`}
+  alt="Create recipe image"
+  width={1000}
+  height={500}
+/>
+
+### Simple example
+
+Let's do a walkthrough of a simple example, where we toggle the display output option. We'll do a side by side comparision of one recipe with different display toggle settings.
+
+<table>
+  <thead>
+    <tr>
+      <th>Recipe A</th>
+      <th>Recipe B</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <Image
+          src={`${prefix}/learn/simpletoggle.png`}
+          alt="Create recipe image"
+          width={1000}
+          height={500}
+        />
+      </td>
+      <td>
+        <Image
+          src={`${prefix}/learn/bothdisplayed.png`}
+          alt="Create recipe image"
+          width={1000}
+          height={500}
+        />
+      </td>
+    </tr>
+    <tr>
+      <td className="text-center">
+        The first macro in recipe A doesn't have "Display output" enabled.
+      </td>
+      <td className="text-center">
+        Both macros in recipe B have their "Display output" enabled.
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+Notice the "Display output" toggle settings for the recipes. This can also be seen through the "eye" icon on the macros.
+
+<table>
+  <thead>
+    <tr>
+      <th>Recipe A</th>
+      <th>Recipe B</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <Image
+          src={`${prefix}/learn/showsimpletoggle.png`}
+          alt="Create recipe image"
+          width={1000}
+          height={500}
+        />
+      </td>
+      <td>
+        <Image
+          src={`${prefix}/learn/bothtoggle.png`}
+          alt="Create recipe image"
+          width={1000}
+          height={500}
+        />
+      </td>
+    </tr>
+    <tr>
+      <td className="text-center">
+        The first macro doesn't have "Display output" checked.
+      </td>
+      <td className="text-center">
+        The first macro has "Display output" checked.
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+This is the final output of the recipes.
+
+<table>
+  <thead>
+    <tr>
+      <th>Recipe A</th>
+      <th>Recipe B</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <Image
+          src={`${prefix}/learn/simpletoggleoutput.png`}
+          alt="Create recipe image"
+          width={1000}
+          height={500}
+        />
+      </td>
+      <td>
+        <Image
+          src={`${prefix}/learn/bothresult.png`}
+          alt="Create recipe image"
+          width={1000}
+          height={500}
+        />
+      </td>
+    </tr>
+    <tr>
+      <td className="text-center">Has only one output.</td>
+      <td className="text-center">Has two outputs.</td>
+    </tr>
+  </tbody>
+</table>
+
+### Nested Example
+
+The sample toggle logic applies when macros are nested. We'll do a side by side comparision of one recipe with different display toggle settings.
+
+<table>
+  <thead>
+    <tr>
+      <th>Recipe A</th>
+      <th>Recipe B</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <Image
+          src={`${prefix}/learn/nesthide.png`}
+          alt="Create recipe image"
+          width={1000}
+          height={500}
+        />
+      </td>
+      <td>
+        <Image
+          src={`${prefix}/learn/nestshow.png`}
+          alt="Create recipe image"
+          width={1000}
+          height={500}
+        />
+      </td>
+    </tr>
+    <tr>
+      <td className="text-center">
+        Middle macro is has "Display output" disabled. Slashed "eye" icon.
+      </td>
+      <td className="text-center">
+        Middle macro has "Displayed output" enabled. Normal "eye" icon.
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+The results look like the following
+
+<table>
+  <thead>
+    <tr>
+      <th>Recipe A</th>
+      <th>Recipe B</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <Image
+          src={`${prefix}/learn/nesthideoutput.png`}
+          alt="Create recipe image"
+          width={1000}
+          height={500}
+        />
+      </td>
+      <td>
+        <Image
+          src={`${prefix}/learn/nestshowoutput.png`}
+          alt="Create recipe image"
+          width={1000}
+          height={500}
+        />
+      </td>
+    </tr>
+    <tr>
+      <td className="text-center">
+        Intermediate output is hidden, only final macro is displayed.
+      </td>
+      <td className="text-center">All intermediate outputs are displayed.</td>
+    </tr>
+  </tbody>
+</table>
+
+## Additional Notes
+
+- "Input" macros always output a display for the user to provide input (images, pds, audios, etc).
+- Plain text (anything that isn't a macro) is always displayed by default (this may change in the future)

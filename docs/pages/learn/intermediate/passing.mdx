@@ -1,0 +1,66 @@
+import Image from "next/image";
+import prefix from "../../../lib/config";
+
+# Passing
+
+Powerful workflows can be built when multiple macros are put together. Macros follow the "waterfall" rule.
+
+## Combining macro rules
+
+Macros are combined using indents. The first macro is considered the start of a "Block". Every indented macro will use all of the data that has appear thus far in its Block, hence a "waterfall". For example, consider the following recipe.
+
+<Image
+  src={`${prefix}/learn/chainedmacro.png`}
+  alt="Create recipe image"
+  width={1000}
+  height={500}
+/>
+
+For the sake of simplicity, a text description of this recipe looks like the following
+
+```
+<generate macro 1>: write a 500 word essay about dogs
+    <generate macro 2>: summarize the essay, prioritize quality or quantity
+```
+
+This is a description of how inputs and outputs were handled
+
+- First we run `<generate macro 1>`
+
+  - inputs: []
+  - instruction: write a 500 word essay about dogs
+  - output: "essay from llm"
+
+- Then we run `<generate macro 2>`
+  - inputs: [write a 500 word essay about dogs, "essay from lmm"]
+  - instruction: summarize the essay, prioritize quality or quantity
+  - output: "summarized essay"
+
+Note that `<generate macro 2>` has context of everything that occured in `<generate macro 1>`. All the inputs and outputs thus far become context for the next macro in the waterfall.
+
+## Results
+
+When we run the example recipe, we get the following outputs
+
+<div className="flex gap-4 flex-wrap">
+  <div className="w-full text-center">
+    <Image
+      src={`${prefix}/learn/essay.png`}
+      alt="Create recipe image"
+      width={1000}
+      height={500}
+      className="object-contain"
+    />
+    <p className="mt-2">500 word essay (generate macro 1 output)</p>
+  </div>
+  <div className="w-full text-center">
+    <Image
+      src={`${prefix}/learn/summary.png`}
+      alt="Create recipe image"
+      width={1000}
+      height={500}
+      className="object-contain"
+    />
+    <p className="mt-2">Essay summary (generate macro 2 output)</p>
+  </div>
+</div>
