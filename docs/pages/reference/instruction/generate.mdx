@@ -1,0 +1,37 @@
+import prefix from "../../../lib/config";
+import Image from "next/image";
+
+# Generate
+
+Description: asks an LLM to generate text. This is similar to prompting an LLM.
+
+- `Input`: All of the context in its block.
+- `Instruction`: This is configured in the recipe. It gives an LLM instructions on what it should be generating.
+- `Output`: The output is the text that an LLM generates. This appears in the results pane by default.
+
+## Usage tips
+
+When this macro is nested underneath other macros, it will use all of the context it has seen its block.
+
+## Macro preview
+
+<Image
+  src={`${prefix}/reference/generatepreview.png`}
+  alt="Create recipe image"
+  width={1000}
+  height={500}
+  className="object-contain"
+/>
+
+## Macro in action
+
+<video
+className="w-full rounded-lg"
+controls
+autoPlay
+muted
+loop
+src={`${prefix}/reference/generateaction.mov`}
+type="video/mp4"
+
+> </video>

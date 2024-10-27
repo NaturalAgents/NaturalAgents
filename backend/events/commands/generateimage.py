@@ -10,7 +10,7 @@ class GenerateImage:
         self.output = None
         self.node = node
 
-    def generate_image(prompt, model='dall-e-2'):
+    def generate_image(self, prompt, model='dall-e-2'):
         response = image_generation(model=model, prompt=prompt)
         url = response["data"][0]['url']
         return url

@@ -1,0 +1,37 @@
+import prefix from "../../lib/config";
+import Image from "next/image";
+
+# Upload PDF
+
+Description: requests a user to upload a PDF.
+
+- `Input`: None. There is no input for this macro.
+- `Instruction`: None. There are configurable instructions for this macro.
+- `Output`: The output is the text extracted from the uploaded PDF. This does not appear in the results pane by default.
+
+## Usage tip
+
+You can use this macro anywhere in a recipe. When the macro starts running, the recipe will pause until the user uploads a PDF. If nested inside a block, the text extracted from the PDF will then become available for all subsequent macros that are nested underneath the `add pdf` macro.
+
+## Macro preview
+
+<Image
+  src={`${prefix}/reference/summarypreview.png`}
+  alt="Create recipe image"
+  width={1000}
+  height={500}
+  className="object-contain"
+/>
+
+## Macro in action
+
+<video
+className="w-full rounded-lg"
+controls
+autoPlay
+muted
+loop
+src={`${prefix}/reference/summaryaction.mov`}
+type="video/mp4"
+
+> </video>

@@ -11,5 +11,5 @@ export default {
     type: "separator",
   },
   instruction: "Require Instruction",
-  summarize: "Summarize",
+  summary: "Summary",
 };

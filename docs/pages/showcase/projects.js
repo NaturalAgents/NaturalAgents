@@ -14,7 +14,7 @@ const galleryItems = [
     id: 2,
     title: "PDF Question Assistant",
     description: "Answers user's questions about uploaded PDF",
-    imageUrl: "pdfassistant",
+    imageUrl: `${prefix}/showcase/questionassist.png`,
     slug: "pdfassistant",
   },
 ];

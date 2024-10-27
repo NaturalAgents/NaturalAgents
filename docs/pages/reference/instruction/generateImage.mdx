@@ -1,0 +1,36 @@
+import prefix from "../../../lib/config";
+import Image from "next/image";
+
+# Generate Image
+
+Description: generates an image from a description.
+
+- `Input`: None.
+- `Instruction`: This is a description for the type of image to generate.
+- `Output`: The output is the generated image. This appears in the results pane by default.
+
+## Usage tips
+
+This is best used as a standalone macro. You can nest is underneath other macros, but it will behave independently.
+
+## Macro preview
+
+<Image
+  src={`${prefix}/reference/imagegenpreview.png`}
+  alt="Create recipe image"
+  width={1000}
+  height={500}
+  className="object-contain"
+/>
+
+## Macro in action
+
+<video
+  className="w-full rounded-lg"
+  controls
+  autoPlay
+  muted
+  loop
+  src={`${prefix}/reference/imagegenaction.mov`}
+  type="video/mp4"
+></video>

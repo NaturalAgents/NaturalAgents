@@ -1,0 +1,37 @@
+import prefix from "../../lib/config";
+import Image from "next/image";
+
+# User Input
+
+Description: requests a user for text input.
+
+- `Input`: None. There is no input for this macro.
+- `Instruction`: This is configured in the recipe. It's simply text instruction that appear when the recipe is running. This informs the user what is expected of them when using the text area.
+- `Output`: The output is the text that the user enters. This does not appear in the results pane by default.
+
+## Usage tip
+
+You can use this macro anywhere in a recipe. When the macro starts running, the recipe will pause until the user inputs text. If nested inside a block, the text from the user then become available for all subsequent macros that are nested underneath the `user input` macro.
+
+## Macro preview
+
+<Image
+  src={`${prefix}/reference/userinputpreview.png`}
+  alt="Create recipe image"
+  width={1000}
+  height={500}
+  className="object-contain"
+/>
+
+## Macro in action
+
+<video
+className="w-full rounded-lg"
+controls
+autoPlay
+muted
+loop
+src={`${prefix}/reference/userinputaction.mov`}
+type="video/mp4"
+
+> </video>

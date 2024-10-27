@@ -1,0 +1,36 @@
+import prefix from "../../lib/config";
+import Image from "next/image";
+
+# Summary
+
+Description: creates a summary from text.
+
+- `Input`: All of the context in its block.
+- `Instruction`: None. The instructions for this macro are pre-defined.
+- `Output`: The output is the summary of all the context that appear in its `Input`. This summary is displayed by default in the results pane.
+
+## Usage tips
+
+You should only use this macro when its nested underneath other macros. It will use all of the context that has appear thus far in the block, and create a summary from it.
+
+## Macro preview
+
+<Image
+  src={`${prefix}/reference/summarypreview.png`}
+  alt="Create recipe image"
+  width={1000}
+  height={500}
+  className="object-contain"
+/>
+
+## Macro in action
+
+<video
+  className="w-full rounded-lg"
+  controls
+  autoPlay
+  muted
+  loop
+  src={`${prefix}/reference/summaryaction.mov`}
+  type="video/mp4"
+></video>
