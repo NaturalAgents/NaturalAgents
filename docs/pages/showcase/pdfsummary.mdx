@@ -1,1 +1,34 @@
+import prefix from "../../lib/config";
+import Image from "next/image";
+
 # PDF Summarizer
+
+<div className="flex flex-col items-center justify-center text-center">
+  <div className="w-full max-w-4xl mt-8 aspect-w-16 aspect-h-9 border-4 border-current rounded-lg dark:border-0">
+    <video
+      className="w-full h-full rounded-lg"
+      controls
+      autoPlay
+      muted
+      loop
+      src={`${prefix}/showcase/summarydemo.mov`}
+      type="video/mp4"
+    ></video>
+  </div>
+</div>
+
+## Recipe details
+
+<Image
+  src={`${prefix}/showcase/summaryrecipe.png`}
+  alt="Create recipe image"
+  width={1000}
+  height={500}
+  className="object-contain"
+/>
+
+Here we use two macros `Add PDF` and `summary`.
+
+`Add PDF` displays a button which the user can use to upload a PDF. The macro will automatically handle the uploading and extract all the text inside the PDF.
+
+The `summary` macro is nested underneath `Add PDF`. This means it will have access to the text that was extracted. The `summary` macro automatically summarizes all the text, and then dispalys the output to the user.

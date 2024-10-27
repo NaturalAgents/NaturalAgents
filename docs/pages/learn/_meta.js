@@ -17,7 +17,7 @@ export default {
         Example Recipes <FaExternalLinkAlt className="ml-2 mt-1" />
       </>
     ),
-    href: "/examples",
+    href: "/showcase",
     newWindow: false,
   },
   macro_link: {

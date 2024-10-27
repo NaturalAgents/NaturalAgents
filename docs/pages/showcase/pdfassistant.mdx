@@ -1,0 +1,36 @@
+import prefix from "../../lib/config";
+import Image from "next/image";
+
+# PDF Question Assistant
+
+<div className="flex flex-col items-center justify-center text-center">
+  <div className="w-full max-w-4xl mt-8 aspect-w-16 aspect-h-9 border-4 border-current rounded-lg dark:border-0">
+    <video
+      className="w-full h-full rounded-lg"
+      controls
+      autoPlay
+      muted
+      loop
+      src={`${prefix}/showcase/questionassistdemo.mov`}
+      type="video/mp4"
+    ></video>
+  </div>
+</div>
+
+## Recipe details
+
+<Image
+  src={`${prefix}/showcase/questionassist.png`}
+  alt="Create recipe image"
+  width={1000}
+  height={500}
+  className="object-contain"
+/>
+
+Here we use three macros `Add PDF`, `user input` and `generate`.
+
+`Add PDF` displays a button which the user can use to upload a PDF. The macro will automatically handle the uploading and extract all the text inside the PDF.
+
+`user input` displays a text area where the user can specify their question. Note that we specified the instructions for the text area when creating the recipe.
+
+`generate` is used to ask an LLM to answer the user's question about the PDF. Since it is nested underneath `Add PDF` and `user input`, it has access to both the PDF's text and the user's question. All of this gets passed as context, which the LLM uses to answer the user's question.

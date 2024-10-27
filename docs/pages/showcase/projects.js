@@ -1,19 +1,21 @@
 import Image from "next/image";
 import Link from "next/link";
+import prefix from "../../lib/config";
 
 const galleryItems = [
   {
     id: 1,
     title: "PDF Summarizer",
-    description: "Description for Item 1",
-    imageUrl: "/images/item1.jpg",
+    description: "Summarizes uploaded PDFs",
+    imageUrl: `${prefix}/showcase/summaryrecipe.png`,
     slug: "pdfsummary",
   },
   {
     id: 2,
     title: "PDF Question Assistant",
-    description: "Description for Item 2",
+    description: "Answers user's questions about uploaded PDF",
     imageUrl: "pdfassistant",
+    slug: "pdfassistant",
   },
 ];
 

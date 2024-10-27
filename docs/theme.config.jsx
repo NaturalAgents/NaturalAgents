@@ -41,9 +41,25 @@ export default {
         <title>{pageTitle}</title>
         <meta
           name="description"
-          content={meta?.description || "Default description for NaturalAgents"}
+          content={
+            meta?.description ||
+            "Anyone can build custom agents! (using simple macros)"
+          }
         />
+        <meta property="og:title" content={pageTitle} />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta
+          property="og:video"
+          content={`${prefix}/showcase/questionassitdemo.mov`}
+        />
+        <meta property="og:video:type" content="video/mp4" />
+        <meta property="og:video:width" content="1280" />
+        <meta property="og:video:height" content="720" />
+        <meta
+          property="og:image"
+          content={`${prefix}/showcase/questionassist.png`}
+        />
+        <meta property="og:image:alt" content="Video thumbnail" />
         <link rel="icon" href={`${prefix}/static/images/logo.ico`} />{" "}
       </>
     );

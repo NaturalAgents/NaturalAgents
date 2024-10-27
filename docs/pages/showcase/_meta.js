@@ -6,4 +6,10 @@ export default {
       typesetting: "article",
     },
   },
+  pdfassistant: {
+    type: "page",
+    theme: {
+      typesetting: "article",
+    },
+  },
 };
