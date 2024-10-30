@@ -66,6 +66,11 @@ export class Session {
             detail: { data },
           });
           Session._eventTarget.dispatchEvent(event);
+        } else if (data.config) {
+          const event = new CustomEvent("sessionConfig", {
+            detail: { data },
+          });
+          Session._eventTarget.dispatchEvent(event);
         } else {
           const event = new CustomEvent("sessionMessage", {
             detail: { data },

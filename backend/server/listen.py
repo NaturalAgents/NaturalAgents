@@ -240,10 +240,8 @@ def save_file(data: FileWrite):
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     """
-        {action: "initialize"} # setup workspace if it doesn't exist
+        {action: "config"} # setup workspace if it doesn't exist
         {action: "read", file: "/workspace/useragents/filename.txt"}
-        {action: "read", file: "/workspace/useragents/filename.txt"}
-        {action: "run", content: {}} # run recipe
         {action: "ping_agent", msg: {}} # ping agent whether or not its waiting for a response
     
     """
@@ -279,9 +277,9 @@ async def websocket_endpoint(websocket: WebSocket):
                 with open(env_file_path, "w") as env_file:
                     env_file.writelines(lines)
 
-                await websocket.send_json({"message": f"'{provider_name}' provider added successfully!"})
+                await websocket.send_json({"config": f"'{provider_name}' provider added successfully!", "type": "sucess"})
             else:
-                await websocket.send_json({"message": "Unsupported provider"})
+                await websocket.send_json({"config": "Unsupported provider", "type": "error"})
 
 
         if data["action"] == "get_config":
@@ -293,7 +291,7 @@ async def websocket_endpoint(websocket: WebSocket):
                 KEY_MAP_INV =  {v: k for k, v in KEY_MAP.items()}
                 providers = [KEY_MAP_INV[key_name] for key_name in lines]
             
-            await websocket.send_json({"config": json.dumps(providers)})
+            await websocket.send_json({"config": json.dumps(providers), "type": "info"})
             
 
         if data["action"] == "run":

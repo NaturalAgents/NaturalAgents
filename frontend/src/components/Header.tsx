@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Session } from "@/services/session";
+import { toast } from "@/hooks/use-toast";
 
 const LLM_PROVIDERS = [
   { name: "OpenAI", icon: "/static/icons/openai.svg" },
@@ -149,6 +150,33 @@ const ViewProvider = ({
 
 const Header = () => {
   const [isAddingNew, setIsAddingNew] = useState(false); // Track "plus" button click
+
+  useEffect(() => {
+    Session.startNewSession();
+
+    const configInfo = async (event: Event) => {
+      const customEvent = event as CustomEvent; // Type casting to CustomEvent
+      const newMessage = customEvent.detail.data;
+      if (newMessage.type == "error") {
+        toast({
+          title: "Error :(",
+          description: newMessage.config,
+          variant: "destructive",
+        });
+      } else if (newMessage.type == "sucess") {
+        toast({
+          title: "Success!",
+          description: newMessage.config,
+        });
+      }
+    };
+
+    Session.addEventListener("sessionConfig", configInfo);
+
+    return () => {
+      Session.removeEventListener("finished", configInfo);
+    };
+  }, []);
 
   return (
     <header className="w-full py-2 shadow-md border-b">
