@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { FaCog } from "react-icons/fa";
+import { useEffect, useState } from "react";
+import { FaCog, FaPlus, FaArrowLeft, FaEllipsisV } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -10,15 +10,300 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Session } from "@/services/session";
+import { toast } from "@/hooks/use-toast";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+
+const LLM_PROVIDERS = [
+  { name: "OpenAI", icon: "/static/images/openai.svg" },
+  { name: "Anthropic", icon: "/static/images/anthropic.svg" },
+  // Add more providers as needed
+];
+
+const updateApiKey = (selectedProvider: string, apiKey: string) => {
+  Session.send(
+    JSON.stringify({
+      action: "set_api_key",
+      type: "add",
+      llm_provider: selectedProvider,
+      llm_api_key: apiKey,
+    })
+  );
+};
+
+const getConfig = () => {
+  Session.send(
+    JSON.stringify({
+      action: "get_config",
+    })
+  );
+};
+
+type Views = "view" | "add" | "update";
+
+const AddProvider = ({
+  setCurrentView,
+}: {
+  setCurrentView: (value: Views) => void;
+}) => {
+  const [apiKey, setApiKey] = useState("");
+  const [saved, setSaved] = useState(false);
+  const [selectedProvider, setSelectedProvider] = useState<string | null>(null);
+
+  const handleSave = async () => {
+    setSaved(true);
+    if (selectedProvider) {
+      updateApiKey(selectedProvider, apiKey);
+    }
+    setTimeout(() => setSaved(false), 2000); // Reset saved message after 2 seconds
+    setCurrentView("view");
+  };
+
+  return (
+    <>
+      <div
+        className="flex align-right space-x-2 mb-4 cursor-pointer"
+        onClick={() => setCurrentView("view")}
+      >
+        <FaArrowLeft size={16} />
+        <p className="text-sm font-medium">Back to list</p>
+      </div>
+
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <label htmlFor="new-provider" className="text-sm font-medium">
+            LLM Providers
+          </label>
+          <Select onValueChange={(value) => setSelectedProvider(value)}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select LLM Provider" />
+            </SelectTrigger>
+            <SelectContent>
+              {LLM_PROVIDERS.map((provider) => (
+                <SelectItem key={provider.name} value={provider.name}>
+                  {provider.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2 mt-4">
+          <label htmlFor="new-api-key" className="text-sm font-medium">
+            API Key
+          </label>
+          <Input
+            id="new-api-key"
+            value={apiKey}
+            type="password"
+            onChange={(e) => setApiKey(e.target.value)}
+            placeholder="Enter API Key"
+          />
+        </div>
+      </div>
+
+      <Button
+        onClick={handleSave}
+        disabled={!selectedProvider || !apiKey}
+        className="mt-4"
+      >
+        Save
+      </Button>
+      {saved && <p className="text-sm text-green-500">Settings saved!</p>}
+    </>
+  );
+};
+
+const ViewProvider = ({
+  setCurrentView,
+  providers,
+  setSelectedProvider,
+}: {
+  setCurrentView: (value: Views) => void;
+  providers: { name: string; icon: string }[];
+  setSelectedProvider: (provider: { name: string; icon: string }) => void;
+}) => {
+  useEffect(() => {
+    // Get the configured list of api options from backend
+    getConfig();
+  }, []);
+
+  const deleteProvider = (name: string) => {
+    Session.send(
+      JSON.stringify({
+        action: "set_api_key",
+        type: "delete",
+        llm_provider: name,
+      })
+    );
+
+    getConfig();
+  };
+
+  return (
+    <>
+      <div
+        className="flex justify-end items-center space-x-2 cursor-pointer"
+        onClick={() => setCurrentView("add")}
+      >
+        <FaPlus size={16} />
+        <p className="text-sm font-medium">Add LLM Provider</p>
+      </div>
+
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-2">
+        {providers.map((provider) => (
+          <div
+            key={provider.name}
+            className="relative flex flex-col items-center cursor-pointer p-2 border rounded-lg border-green-300"
+          >
+            {/* Dropdown Menu with Trigger */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <div
+                  className="absolute top-2 right-2 cursor-pointer"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <FaEllipsisV size={16} />
+                </div>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="z-50">
+                <DropdownMenuItem
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setCurrentView("update");
+                    setSelectedProvider(provider);
+                  }}
+                >
+                  Update API Key
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    deleteProvider(provider.name);
+                  }}
+                  className="focus:bg-red-500 focus:text-white"
+                >
+                  Delete Provider
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <img
+              src={provider.icon}
+              alt={`${provider.name} icon`}
+              className="h-8 w-8 mb-1"
+            />
+            <p className="text-sm">{provider.name}</p>
+          </div>
+        ))}
+      </div>
+    </>
+  );
+};
+
+const HandleProvider = ({
+  setCurrentView,
+  selectedProvider,
+}: {
+  setCurrentView: (value: Views) => void;
+  selectedProvider: { name: string; icon: string } | null;
+}) => {
+  const [apiKey, setApiKey] = useState("");
+
+  const handleUpdate = () => {
+    if (selectedProvider) {
+      updateApiKey(selectedProvider.name, apiKey);
+      setCurrentView("view");
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      <div
+        className="flex align-right space-x-2 mb-4 cursor-pointer"
+        onClick={() => setCurrentView("view")}
+      >
+        <FaArrowLeft size={16} />
+        <p className="text-sm font-medium">Back to list</p>
+      </div>
+
+      <div className="space-y-2">
+        <label className="text-sm font-bold">
+          Update {selectedProvider && `${selectedProvider.name}`} API Key
+        </label>
+        <Input
+          value={apiKey}
+          type="password"
+          onChange={(e) => setApiKey(e.target.value)}
+          placeholder="Enter new API Key"
+        />
+      </div>
+
+      <Button onClick={handleUpdate} disabled={!apiKey} className="mt-4">
+        Update Key
+      </Button>
+    </div>
+  );
+};
 
 const Header = () => {
-  const [feedbackOptIn, setFeedbackOptIn] = useState(false);
+  const [currentView, setCurrentView] = useState<Views>("view"); // Track "plus" button click
+  const [configuredProviders, setConfiguredProviders] = useState<
+    { name: string; icon: string }[]
+  >([{ name: "OpenAI", icon: "/static/images/openai.svg" }]);
 
-  const handleToggle = () => {
-    setFeedbackOptIn(!feedbackOptIn);
-  };
+  const [selectedProvider, setSelectedProvider] = useState<{
+    name: string;
+    icon: string;
+  } | null>(null);
+
+  useEffect(() => {
+    Session.startNewSession();
+
+    const configInfo = async (event: Event) => {
+      const customEvent = event as CustomEvent; // Type casting to CustomEvent
+      const newMessage = customEvent.detail.data;
+      if (newMessage.type == "error") {
+        toast({
+          title: "Error :(",
+          description: newMessage.config,
+          variant: "destructive",
+        });
+      } else if (newMessage.type == "sucess") {
+        toast({
+          title: "Success!",
+          description: newMessage.config,
+        });
+      } else if (newMessage.type == "info") {
+        const providers = JSON.parse(newMessage.config);
+        const filteredProviders = LLM_PROVIDERS.filter((provider) =>
+          providers.includes(provider.name)
+        );
+        setConfiguredProviders(filteredProviders);
+      }
+    };
+
+    Session.addEventListener("sessionConfig", configInfo);
+
+    return () => {
+      Session.removeEventListener("finished", configInfo);
+    };
+  }, []);
 
   return (
     <header className="w-full py-2 shadow-md border-b">
@@ -28,7 +313,6 @@ const Header = () => {
           <h1 className="text-xl font-bold">NaturalAgents</h1>
         </div>
 
-        {/* Move Settings Icon to the Right */}
         <div className="ml-12">
           <Dialog>
             <DialogTrigger asChild>
@@ -39,22 +323,24 @@ const Header = () => {
 
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Settings</DialogTitle>
+                <DialogTitle>Configured LLM Providers</DialogTitle>
               </DialogHeader>
 
               <div className="mt-4 space-y-4">
-                <div className="flex items-center space-x-3">
-                  <Label htmlFor="feedback-toggle">Opt-in for feedback</Label>
-                  <Switch
-                    id="feedback-toggle"
-                    checked={feedbackOptIn}
-                    onCheckedChange={handleToggle}
+                {currentView == "view" ? (
+                  <ViewProvider
+                    setCurrentView={setCurrentView}
+                    providers={configuredProviders}
+                    setSelectedProvider={setSelectedProvider}
                   />
-                </div>
-                <p className="text-sm text-muted-foreground">
-                  Enable this option to provide feedback and help us improve the
-                  product.
-                </p>
+                ) : currentView == "add" ? (
+                  <AddProvider setCurrentView={setCurrentView} />
+                ) : (
+                  <HandleProvider
+                    setCurrentView={setCurrentView}
+                    selectedProvider={selectedProvider}
+                  />
+                )}
               </div>
             </DialogContent>
           </Dialog>
