@@ -240,7 +240,8 @@ def save_file(data: FileWrite):
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     """
-        {action: "config"} # setup workspace if it doesn't exist
+        {action: "set_api_key", llm_provider: "OpenAI", llm_api_key: "sk-test"} # setup workspace if it doesn't exist
+        {action: "get_config"}
         {action: "read", file: "/workspace/useragents/filename.txt"}
         {action: "ping_agent", msg: {}} # ping agent whether or not its waiting for a response
     
@@ -283,6 +284,7 @@ async def websocket_endpoint(websocket: WebSocket):
 
 
         if data["action"] == "get_config":
+            env_file_path = "/workspace/.env"
             providers = []
             if os.path.exists(env_file_path):
                 with open(env_file_path, "r") as env_file:

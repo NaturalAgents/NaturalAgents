@@ -22,8 +22,8 @@ import { Session } from "@/services/session";
 import { toast } from "@/hooks/use-toast";
 
 const LLM_PROVIDERS = [
-  { name: "OpenAI", icon: "/static/icons/openai.svg" },
-  { name: "Anthropic", icon: "/static/icons/anthropic.svg" },
+  { name: "OpenAI", icon: "/static/images/openai.svg" },
+  { name: "Anthropic", icon: "/static/images/anthropic.svg" },
   // Add more providers as needed
 ];
 
@@ -108,19 +108,24 @@ const AddProvider = ({
 
 const ViewProvider = ({
   setIsAddingNew,
+  providers,
 }: {
   setIsAddingNew: (value: boolean) => void;
+  providers: { name: string; icon: string }[];
 }) => {
-  const [configuredProviders, setConfiguredProviders] = useState([]);
-
   useEffect(() => {
     // Get the configured list of api options from backend
+    Session.send(
+      JSON.stringify({
+        action: "get_config",
+      })
+    );
   }, []);
 
   return (
     <>
       <div
-        className="flex justify-end items-center space-x-2"
+        className="flex justify-end items-center space-x-2 cursor-pointer"
         onClick={() => setIsAddingNew(true)}
       >
         <FaPlus size={16} />
@@ -128,7 +133,7 @@ const ViewProvider = ({
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-2">
-        {LLM_PROVIDERS.map((provider) => (
+        {providers.map((provider) => (
           <div
             key={provider.name}
             className={
@@ -150,6 +155,9 @@ const ViewProvider = ({
 
 const Header = () => {
   const [isAddingNew, setIsAddingNew] = useState(false); // Track "plus" button click
+  const [configuredProviders, setConfiguredProviders] = useState<
+    { name: string; icon: string }[]
+  >([]);
 
   useEffect(() => {
     Session.startNewSession();
@@ -168,6 +176,12 @@ const Header = () => {
           title: "Success!",
           description: newMessage.config,
         });
+      } else if (newMessage.type == "info") {
+        const providers = JSON.parse(newMessage.config);
+        const filteredProviders = LLM_PROVIDERS.filter((provider) =>
+          providers.includes(provider.name)
+        );
+        setConfiguredProviders(filteredProviders);
       }
     };
 
@@ -201,7 +215,10 @@ const Header = () => {
 
               <div className="mt-4 space-y-4">
                 {!isAddingNew ? (
-                  <ViewProvider setIsAddingNew={setIsAddingNew} />
+                  <ViewProvider
+                    setIsAddingNew={setIsAddingNew}
+                    providers={configuredProviders}
+                  />
                 ) : (
                   <AddProvider setIsAddingNew={setIsAddingNew} />
                 )}
