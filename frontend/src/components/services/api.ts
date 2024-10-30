@@ -88,5 +88,5 @@ export const writeFile = async (
   if (response.ok) {
     return true;
   }
-  false;
+  return false;
 };

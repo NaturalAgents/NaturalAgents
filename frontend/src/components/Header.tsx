@@ -18,17 +18,9 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { storeApiKey } from "./services/api";
+import { Session } from "@/services/session";
 
 const LLM_PROVIDERS = [
-  { name: "OpenAI", icon: "/static/icons/openai.svg" },
-  { name: "Anthropic", icon: "/static/icons/anthropic.svg" },
-  { name: "OpenAI", icon: "/static/icons/openai.svg" },
-  { name: "Anthropic", icon: "/static/icons/anthropic.svg" },
-  { name: "OpenAI", icon: "/static/icons/openai.svg" },
-  { name: "Anthropic", icon: "/static/icons/anthropic.svg" },
-  { name: "OpenAI", icon: "/static/icons/openai.svg" },
-  { name: "Anthropic", icon: "/static/icons/anthropic.svg" },
   { name: "OpenAI", icon: "/static/icons/openai.svg" },
   { name: "Anthropic", icon: "/static/icons/anthropic.svg" },
   // Add more providers as needed
@@ -45,9 +37,17 @@ const AddProvider = ({
 
   const handleSave = async () => {
     setSaved(true);
+    if (selectedProvider) {
+      Session.send(
+        JSON.stringify({
+          action: "set_api_key",
+          llm_provider: selectedProvider,
+          llm_api_key: apiKey,
+        })
+      );
+    }
     setTimeout(() => setSaved(false), 2000); // Reset saved message after 2 seconds
-
-    // TODO store api key
+    setIsAddingNew(false);
   };
 
   return (
@@ -110,10 +110,16 @@ const ViewProvider = ({
 }: {
   setIsAddingNew: (value: boolean) => void;
 }) => {
+  const [configuredProviders, setConfiguredProviders] = useState([]);
+
+  useEffect(() => {
+    // Get the configured list of api options from backend
+  }, []);
+
   return (
     <>
       <div
-        className="flex justify-end items-center space-x-2 cursor-pointer"
+        className="flex justify-end items-center space-x-2"
         onClick={() => setIsAddingNew(true)}
       >
         <FaPlus size={16} />
@@ -143,10 +149,6 @@ const ViewProvider = ({
 
 const Header = () => {
   const [isAddingNew, setIsAddingNew] = useState(false); // Track "plus" button click
-
-  useEffect(() => {
-    // Get the configured list of api options from backend
-  }, []);
 
   return (
     <header className="w-full py-2 shadow-md border-b">
