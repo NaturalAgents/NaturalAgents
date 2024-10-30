@@ -240,7 +240,7 @@ def save_file(data: FileWrite):
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     """
-        {action: "set_api_key", llm_provider: "OpenAI", llm_api_key: "sk-test"} # setup workspace if it doesn't exist
+        {action: "set_api_key", llm_provider: "OpenAI", llm_api_key: "sk-test", type: "add"} # setup workspace if it doesn't exist
         {action: "get_config"}
         {action: "read", file: "/workspace/useragents/filename.txt"}
         {action: "ping_agent", msg: {}} # ping agent whether or not its waiting for a response
@@ -256,8 +256,8 @@ async def websocket_endpoint(websocket: WebSocket):
 
         if data["action"] == "set_api_key":
             provider_name = data["llm_provider"]
-            llm_api_key = data["llm_api_key"]
             env_file_path = "/workspace/.env"
+            
 
             if provider_name in KEY_MAP:
                 provider_key_prefix = KEY_MAP[provider_name]
@@ -265,20 +265,24 @@ async def websocket_endpoint(websocket: WebSocket):
                     with open(env_file_path, "r") as env_file:
                         lines = env_file.readlines()
 
-                    # Filter out any line that starts with the key name followed by '='
                     lines = [line for line in lines if not line.startswith(f"{provider_key_prefix}=")]
                 else:
                     lines = []
 
+                
+                event_type = data["type"]
+
                 # Add the new API key entry
-                lines.append(f"{provider_key_prefix}={llm_api_key}\n")
+                if event_type == "add":
+                    llm_api_key = data["llm_api_key"]
+                    lines.append(f"{provider_key_prefix}={llm_api_key}\n")
+                
 
                 # Write the updated content back to the .env file
-                print(lines)
                 with open(env_file_path, "w") as env_file:
                     env_file.writelines(lines)
 
-                await websocket.send_json({"config": f"'{provider_name}' provider added successfully!", "type": "sucess"})
+                await websocket.send_json({"config": f"'{provider_name}' provider {event_type}ed successfully!", "type": "sucess"})
             else:
                 await websocket.send_json({"config": "Unsupported provider", "type": "error"})
 

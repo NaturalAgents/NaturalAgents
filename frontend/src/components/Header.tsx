@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { FaCog, FaPlus, FaArrowLeft } from "react-icons/fa";
+import { FaCog, FaPlus, FaArrowLeft, FaEllipsisV } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -20,6 +20,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { Session } from "@/services/session";
 import { toast } from "@/hooks/use-toast";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
 
 const LLM_PROVIDERS = [
   { name: "OpenAI", icon: "/static/images/openai.svg" },
@@ -27,10 +34,31 @@ const LLM_PROVIDERS = [
   // Add more providers as needed
 ];
 
+const updateApiKey = (selectedProvider: string, apiKey: string) => {
+  Session.send(
+    JSON.stringify({
+      action: "set_api_key",
+      type: "add",
+      llm_provider: selectedProvider,
+      llm_api_key: apiKey,
+    })
+  );
+};
+
+const getConfig = () => {
+  Session.send(
+    JSON.stringify({
+      action: "get_config",
+    })
+  );
+};
+
+type Views = "view" | "add" | "update";
+
 const AddProvider = ({
-  setIsAddingNew,
+  setCurrentView,
 }: {
-  setIsAddingNew: (value: boolean) => void;
+  setCurrentView: (value: Views) => void;
 }) => {
   const [apiKey, setApiKey] = useState("");
   const [saved, setSaved] = useState(false);
@@ -39,23 +67,17 @@ const AddProvider = ({
   const handleSave = async () => {
     setSaved(true);
     if (selectedProvider) {
-      Session.send(
-        JSON.stringify({
-          action: "set_api_key",
-          llm_provider: selectedProvider,
-          llm_api_key: apiKey,
-        })
-      );
+      updateApiKey(selectedProvider, apiKey);
     }
     setTimeout(() => setSaved(false), 2000); // Reset saved message after 2 seconds
-    setIsAddingNew(false);
+    setCurrentView("view");
   };
 
   return (
     <>
       <div
         className="flex align-right space-x-2 mb-4 cursor-pointer"
-        onClick={() => setIsAddingNew(false)}
+        onClick={() => setCurrentView("view")}
       >
         <FaArrowLeft size={16} />
         <p className="text-sm font-medium">Back to list</p>
@@ -107,26 +129,36 @@ const AddProvider = ({
 };
 
 const ViewProvider = ({
-  setIsAddingNew,
+  setCurrentView,
   providers,
+  setSelectedProvider,
 }: {
-  setIsAddingNew: (value: boolean) => void;
+  setCurrentView: (value: Views) => void;
   providers: { name: string; icon: string }[];
+  setSelectedProvider: (provider: { name: string; icon: string }) => void;
 }) => {
   useEffect(() => {
     // Get the configured list of api options from backend
+    getConfig();
+  }, []);
+
+  const deleteProvider = (name: string) => {
     Session.send(
       JSON.stringify({
-        action: "get_config",
+        action: "set_api_key",
+        type: "delete",
+        llm_provider: name,
       })
     );
-  }, []);
+
+    getConfig();
+  };
 
   return (
     <>
       <div
         className="flex justify-end items-center space-x-2 cursor-pointer"
-        onClick={() => setIsAddingNew(true)}
+        onClick={() => setCurrentView("add")}
       >
         <FaPlus size={16} />
         <p className="text-sm font-medium">Add LLM Provider</p>
@@ -136,10 +168,41 @@ const ViewProvider = ({
         {providers.map((provider) => (
           <div
             key={provider.name}
-            className={
-              "flex flex-col items-center cursor-pointer p-2 border rounded-lg border-green-300"
-            }
+            className="relative flex flex-col items-center cursor-pointer p-2 border rounded-lg border-green-300"
           >
+            {/* Dropdown Menu with Trigger */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <div
+                  className="absolute top-2 right-2 cursor-pointer"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <FaEllipsisV size={16} />
+                </div>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="z-50">
+                <DropdownMenuItem
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setCurrentView("update");
+                    setSelectedProvider(provider);
+                  }}
+                >
+                  Update API Key
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    deleteProvider(provider.name);
+                  }}
+                  className="focus:bg-red-500 focus:text-white"
+                >
+                  Delete Provider
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
             <img
               src={provider.icon}
               alt={`${provider.name} icon`}
@@ -153,11 +216,61 @@ const ViewProvider = ({
   );
 };
 
+const HandleProvider = ({
+  setCurrentView,
+  selectedProvider,
+}: {
+  setCurrentView: (value: Views) => void;
+  selectedProvider: { name: string; icon: string } | null;
+}) => {
+  const [apiKey, setApiKey] = useState("");
+
+  const handleUpdate = () => {
+    if (selectedProvider) {
+      updateApiKey(selectedProvider.name, apiKey);
+      setCurrentView("view");
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      <div
+        className="flex align-right space-x-2 mb-4 cursor-pointer"
+        onClick={() => setCurrentView("view")}
+      >
+        <FaArrowLeft size={16} />
+        <p className="text-sm font-medium">Back to list</p>
+      </div>
+
+      <div className="space-y-2">
+        <label className="text-sm font-bold">
+          Update {selectedProvider && `${selectedProvider.name}`} API Key
+        </label>
+        <Input
+          value={apiKey}
+          type="password"
+          onChange={(e) => setApiKey(e.target.value)}
+          placeholder="Enter new API Key"
+        />
+      </div>
+
+      <Button onClick={handleUpdate} disabled={!apiKey} className="mt-4">
+        Update Key
+      </Button>
+    </div>
+  );
+};
+
 const Header = () => {
-  const [isAddingNew, setIsAddingNew] = useState(false); // Track "plus" button click
+  const [currentView, setCurrentView] = useState<Views>("view"); // Track "plus" button click
   const [configuredProviders, setConfiguredProviders] = useState<
     { name: string; icon: string }[]
-  >([]);
+  >([{ name: "OpenAI", icon: "/static/images/openai.svg" }]);
+
+  const [selectedProvider, setSelectedProvider] = useState<{
+    name: string;
+    icon: string;
+  } | null>(null);
 
   useEffect(() => {
     Session.startNewSession();
@@ -214,13 +327,19 @@ const Header = () => {
               </DialogHeader>
 
               <div className="mt-4 space-y-4">
-                {!isAddingNew ? (
+                {currentView == "view" ? (
                   <ViewProvider
-                    setIsAddingNew={setIsAddingNew}
+                    setCurrentView={setCurrentView}
                     providers={configuredProviders}
+                    setSelectedProvider={setSelectedProvider}
                   />
+                ) : currentView == "add" ? (
+                  <AddProvider setCurrentView={setCurrentView} />
                 ) : (
-                  <AddProvider setIsAddingNew={setIsAddingNew} />
+                  <HandleProvider
+                    setCurrentView={setCurrentView}
+                    selectedProvider={selectedProvider}
+                  />
                 )}
               </div>
             </DialogContent>
