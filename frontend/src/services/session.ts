@@ -42,14 +42,17 @@ export class Session {
   }
 
   static send = (message: string) => {
-    if (Session._socket) {
-      Session._socket.send(message);
+    if (Session.isConnected()) {
+      Session._socket?.send(message);
+      return true;
+    } else {
+      return false;
     }
   };
 
   private static _setupSocket(): void {
     if (!Session._socket) {
-      throw new Error("no socket ");
+      throw new Error("no socket");
     }
 
     Session._socket.onmessage = (e) => {

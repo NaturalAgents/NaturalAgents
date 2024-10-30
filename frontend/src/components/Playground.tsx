@@ -55,9 +55,18 @@ export default function PlaygroundPage() {
 
     if (editorRef) {
       const data = editorRef.current?.document || [];
-      Session.send(
+      const success = Session.send(
         JSON.stringify({ action: "run", content: JSON.stringify(data) })
       );
+      if (!success) {
+        toast({
+          title: "Attempt",
+          description:
+            "Failed to execute. Websocket connection was not successful :(",
+          variant: "destructive",
+        });
+        setLoading(false);
+      }
     }
   };
 
@@ -89,6 +98,7 @@ export default function PlaygroundPage() {
         toast({
           title: "Save status",
           description: "Failed due to unexpected error :(",
+          variant: "destructive",
         });
       }
     }

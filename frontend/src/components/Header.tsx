@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { FaCog } from "react-icons/fa";
+import { useEffect, useState } from "react";
+import { FaCog, FaPlus, FaArrowLeft } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -10,15 +10,143 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { storeApiKey } from "./services/api";
+
+const LLM_PROVIDERS = [
+  { name: "OpenAI", icon: "/static/icons/openai.svg" },
+  { name: "Anthropic", icon: "/static/icons/anthropic.svg" },
+  { name: "OpenAI", icon: "/static/icons/openai.svg" },
+  { name: "Anthropic", icon: "/static/icons/anthropic.svg" },
+  { name: "OpenAI", icon: "/static/icons/openai.svg" },
+  { name: "Anthropic", icon: "/static/icons/anthropic.svg" },
+  { name: "OpenAI", icon: "/static/icons/openai.svg" },
+  { name: "Anthropic", icon: "/static/icons/anthropic.svg" },
+  { name: "OpenAI", icon: "/static/icons/openai.svg" },
+  { name: "Anthropic", icon: "/static/icons/anthropic.svg" },
+  // Add more providers as needed
+];
+
+const AddProvider = ({
+  setIsAddingNew,
+}: {
+  setIsAddingNew: (value: boolean) => void;
+}) => {
+  const [apiKey, setApiKey] = useState("");
+  const [saved, setSaved] = useState(false);
+  const [selectedProvider, setSelectedProvider] = useState<string | null>(null);
+
+  const handleSave = async () => {
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000); // Reset saved message after 2 seconds
+
+    // TODO store api key
+  };
+
+  return (
+    <>
+      <div
+        className="flex align-right space-x-2 mb-4 cursor-pointer"
+        onClick={() => setIsAddingNew(false)}
+      >
+        <FaArrowLeft size={16} />
+        <p className="text-sm font-medium">Back to list</p>
+      </div>
+
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <label htmlFor="new-provider" className="text-sm font-medium">
+            LLM Providers
+          </label>
+          <Select onValueChange={(value) => setSelectedProvider(value)}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select LLM Provider" />
+            </SelectTrigger>
+            <SelectContent>
+              {LLM_PROVIDERS.map((provider) => (
+                <SelectItem key={provider.name} value={provider.name}>
+                  {provider.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2 mt-4">
+          <label htmlFor="new-api-key" className="text-sm font-medium">
+            API Key
+          </label>
+          <Input
+            id="new-api-key"
+            value={apiKey}
+            type="password"
+            onChange={(e) => setApiKey(e.target.value)}
+            placeholder="Enter API Key"
+          />
+        </div>
+      </div>
+
+      <Button
+        onClick={handleSave}
+        disabled={!selectedProvider || !apiKey}
+        className="mt-4"
+      >
+        Save
+      </Button>
+      {saved && <p className="text-sm text-green-500">Settings saved!</p>}
+    </>
+  );
+};
+
+const ViewProvider = ({
+  setIsAddingNew,
+}: {
+  setIsAddingNew: (value: boolean) => void;
+}) => {
+  return (
+    <>
+      <div
+        className="flex justify-end items-center space-x-2 cursor-pointer"
+        onClick={() => setIsAddingNew(true)}
+      >
+        <FaPlus size={16} />
+        <p className="text-sm font-medium">Add LLM Provider</p>
+      </div>
+
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-2">
+        {LLM_PROVIDERS.map((provider) => (
+          <div
+            key={provider.name}
+            className={
+              "flex flex-col items-center cursor-pointer p-2 border rounded-lg border-green-300"
+            }
+          >
+            <img
+              src={provider.icon}
+              alt={`${provider.name} icon`}
+              className="h-8 w-8 mb-1"
+            />
+            <p className="text-sm">{provider.name}</p>
+          </div>
+        ))}
+      </div>
+    </>
+  );
+};
 
 const Header = () => {
-  const [feedbackOptIn, setFeedbackOptIn] = useState(false);
+  const [isAddingNew, setIsAddingNew] = useState(false); // Track "plus" button click
 
-  const handleToggle = () => {
-    setFeedbackOptIn(!feedbackOptIn);
-  };
+  useEffect(() => {
+    // Get the configured list of api options from backend
+  }, []);
 
   return (
     <header className="w-full py-2 shadow-md border-b">
@@ -28,7 +156,6 @@ const Header = () => {
           <h1 className="text-xl font-bold">NaturalAgents</h1>
         </div>
 
-        {/* Move Settings Icon to the Right */}
         <div className="ml-12">
           <Dialog>
             <DialogTrigger asChild>
@@ -39,22 +166,15 @@ const Header = () => {
 
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Settings</DialogTitle>
+                <DialogTitle>Configured LLM Providers</DialogTitle>
               </DialogHeader>
 
               <div className="mt-4 space-y-4">
-                <div className="flex items-center space-x-3">
-                  <Label htmlFor="feedback-toggle">Opt-in for feedback</Label>
-                  <Switch
-                    id="feedback-toggle"
-                    checked={feedbackOptIn}
-                    onCheckedChange={handleToggle}
-                  />
-                </div>
-                <p className="text-sm text-muted-foreground">
-                  Enable this option to provide feedback and help us improve the
-                  product.
-                </p>
+                {!isAddingNew ? (
+                  <ViewProvider setIsAddingNew={setIsAddingNew} />
+                ) : (
+                  <AddProvider setIsAddingNew={setIsAddingNew} />
+                )}
               </div>
             </DialogContent>
           </Dialog>
