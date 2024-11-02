@@ -31,6 +31,7 @@ import {
 const LLM_PROVIDERS = [
   { name: "OpenAI", icon: "/static/images/openai.svg" },
   { name: "Anthropic", icon: "/static/images/anthropic.svg" },
+  { name: "Gemini", icon: "/static/images/gemini.svg" },
   // Add more providers as needed
 ];
 
@@ -168,7 +169,7 @@ const ViewProvider = ({
         {providers.map((provider) => (
           <div
             key={provider.name}
-            className="relative flex flex-col items-center cursor-pointer p-2 border rounded-lg border-green-300"
+            className="relative flex flex-col items-center p-2 border rounded-lg border-green-300"
           >
             {/* Dropdown Menu with Trigger */}
             <DropdownMenu>

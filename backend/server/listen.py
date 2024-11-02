@@ -9,7 +9,7 @@ import os
 
 app = FastAPI()
 
-KEY_MAP = {"OpenAI": "OPENAI_API_KEY", "Anthropic": "ANTHROPIC_API_KEY"}
+KEY_MAP = {"OpenAI": "OPENAI_API_KEY", "Anthropic": "ANTHROPIC_API_KEY", "Gemini": "GEMINI_API_KEY"}
 
 # Allow CORS for the frontend
 origins = ["*"]  # Allow your frontend's URL
