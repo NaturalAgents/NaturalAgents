@@ -1,4 +1,4 @@
-from routers import api, ws, api_key
+from .routers import api, ws, api_key
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
