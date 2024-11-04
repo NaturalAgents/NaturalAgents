@@ -1,11 +1,10 @@
-from server.routers import api, ws, api_key
+from server.routers import api, ws
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
 #Include routers
-app.include_router(api_key.router, prefix="/api-key", tags=["api-key"])
 app.include_router(api.router, prefix="/api", tags=["api"])
 app.include_router(ws.router)
 
