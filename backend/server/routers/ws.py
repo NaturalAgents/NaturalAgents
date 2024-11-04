@@ -7,7 +7,7 @@ router = APIRouter()
 
 KEY_MAP = {"OpenAI": "OPENAI_API_KEY", "Anthropic": "ANTHROPIC_API_KEY"}
 
-@router.websocket("/")
+@router.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     """
         {action: "set_api_key", llm_provider: "OpenAI", llm_api_key: "sk-test", type: "add"} # setup workspace if it doesn't exist
