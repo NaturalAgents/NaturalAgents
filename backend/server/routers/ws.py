@@ -5,7 +5,7 @@ import os
 
 router = APIRouter()
 
-KEY_MAP = {"OpenAI": "OPENAI_API_KEY", "Anthropic": "ANTHROPIC_API_KEY"}
+KEY_MAP = {"OpenAI": "OPENAI_API_KEY", "Anthropic": "ANTHROPIC_API_KEY", "Gemini": "GEMINI_API_KEY"}
 
 @router.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
