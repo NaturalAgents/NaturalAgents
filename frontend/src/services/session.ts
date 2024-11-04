@@ -4,6 +4,7 @@ export class Session {
   private static _messageQueue = [];
   public static _history: Record<string, unknown>[] = [];
   private static _connecting = false;
+  public static providers = [];
 
   private static _disconnecting = false;
   private static _eventTarget = new EventTarget();
@@ -67,6 +68,8 @@ export class Session {
           });
           Session._eventTarget.dispatchEvent(event);
         } else if (data.config) {
+          Session.providers = data.config;
+
           const event = new CustomEvent("sessionConfig", {
             detail: { data },
           });

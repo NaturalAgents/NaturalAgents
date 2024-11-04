@@ -27,13 +27,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-
-const LLM_PROVIDERS = [
-  { name: "OpenAI", icon: "/static/images/openai.svg" },
-  { name: "Anthropic", icon: "/static/images/anthropic.svg" },
-  { name: "Gemini", icon: "/static/images/gemini.svg" },
-  // Add more providers as needed
-];
+import { LLM_PROVIDERS, PROVIDERS_TYPE } from "./utils/providers";
 
 const updateApiKey = (selectedProvider: string, apiKey: string) => {
   Session.send(
@@ -135,8 +129,8 @@ const ViewProvider = ({
   setSelectedProvider,
 }: {
   setCurrentView: (value: Views) => void;
-  providers: { name: string; icon: string }[];
-  setSelectedProvider: (provider: { name: string; icon: string }) => void;
+  providers: PROVIDERS_TYPE[];
+  setSelectedProvider: (provider: PROVIDERS_TYPE) => void;
 }) => {
   useEffect(() => {
     // Get the configured list of api options from backend
@@ -222,7 +216,7 @@ const HandleProvider = ({
   selectedProvider,
 }: {
   setCurrentView: (value: Views) => void;
-  selectedProvider: { name: string; icon: string } | null;
+  selectedProvider: PROVIDERS_TYPE | null;
 }) => {
   const [apiKey, setApiKey] = useState("");
 
@@ -265,13 +259,11 @@ const HandleProvider = ({
 const Header = () => {
   const [currentView, setCurrentView] = useState<Views>("view"); // Track "plus" button click
   const [configuredProviders, setConfiguredProviders] = useState<
-    { name: string; icon: string }[]
-  >([{ name: "OpenAI", icon: "/static/images/openai.svg" }]);
+    PROVIDERS_TYPE[]
+  >([]);
 
-  const [selectedProvider, setSelectedProvider] = useState<{
-    name: string;
-    icon: string;
-  } | null>(null);
+  const [selectedProvider, setSelectedProvider] =
+    useState<PROVIDERS_TYPE | null>(null);
 
   useEffect(() => {
     Session.startNewSession();
