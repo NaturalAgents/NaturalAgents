@@ -63,6 +63,7 @@ export default function PlaygroundPage() {
 
     if (editorRef) {
       const data = editorRef.current?.document || [];
+      console.log(JSON.stringify(data));
       const success = Session.send(
         JSON.stringify({ action: "run", content: JSON.stringify(data) })
       );

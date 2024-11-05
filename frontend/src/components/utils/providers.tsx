@@ -7,7 +7,11 @@ export const LLM_PROVIDERS = [
   {
     name: "Anthropic",
     icon: "/static/images/anthropic.svg",
-    models: ["claude-3-5-sonnet", "claude-3-haiku", "claude-3-opus"],
+    models: [
+      "claude-3-5-sonnet-20240620",
+      "claude-3-haiku-20240307",
+      "claude-3-opus-20240229",
+    ],
   },
   {
     name: "Gemini",

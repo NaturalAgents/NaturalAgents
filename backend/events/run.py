@@ -37,7 +37,7 @@ class Run:
         def get_node(item):
             id = item["id"]
             if item["type"] == "bubble":
-                node = BlockNode(id=id, node_type=item["props"]["text"], prompt=item["content"][0]["text"], vis=item["props"]["vis"])
+                node = BlockNode(id=id, node_type=item["props"]["text"], prompt=item["content"][0]["text"], vis=item["props"]["vis"], provider=item["props"]["provider"])
             elif item['type'] == 'noparam':
                 node = BlockNode(id=id, node_type=item["props"]["text"], vis=item["props"]["vis"])
             elif item['type'] == 'file':
