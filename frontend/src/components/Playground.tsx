@@ -45,7 +45,6 @@ export default function PlaygroundPage() {
       const newMessage = customEvent.detail.data;
       if (newMessage.finished) {
         setLoading(false);
-        Session.setReady(false);
       }
     };
 

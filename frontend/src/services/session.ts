@@ -12,6 +12,7 @@ export class Session {
   private static _disconnecting = false;
   private static _eventTarget = new EventTarget();
   static _intervalId: NodeJS.Timeout;
+  static _intervalReset: NodeJS.Timeout;
 
   public static restoreOrStartNewSession() {
     if (Session.isConnected()) {
@@ -104,13 +105,29 @@ export class Session {
   }
 
   static setReady(isReady: boolean) {
-    Session._isReady = isReady;
+    /**
+     * Waits for event listener to mount before dispatching agent messages
+     * Removes dispatcher after message queue is emptied and agent has finished
+     */
     if (isReady) {
+      Session._isReady = isReady;
       Session._startDispatch();
+    } else {
+      setInterval(() => {
+        if (Session._messageQueue.length == 0) {
+          Session._isReady = isReady;
+          if (Session._intervalReset) {
+            clearInterval(Session._intervalReset);
+          }
+        }
+      }, 100);
     }
   }
 
   static _startDispatch() {
+    /**
+     * Dispatch agent messages from queue at set interval
+     */
     Session._intervalId = setInterval(() => {
       if (Session._isReady && Session._messageQueue.length > 0) {
         const event = Session._messageQueue.shift();

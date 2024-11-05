@@ -95,6 +95,8 @@ const OutputRender = () => {
       const customEvent = event as CustomEvent; // Type casting to CustomEvent
       const newMessage = customEvent.detail.data;
 
+      console.log("new message", newMessage);
+
       const currentContent = editor.document;
       const contentCopy = [...currentContent];
       if (newMessage.sid) {
@@ -151,6 +153,7 @@ const OutputRender = () => {
 
     return () => {
       Session.removeEventListener("sessionMessage", handleSessionMessage);
+      Session.setReady(false);
     };
   }, [editor]);
 
