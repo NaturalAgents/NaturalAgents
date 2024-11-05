@@ -1,13 +1,17 @@
 // TODO: create a pending queue for when socket connection isn't made on time
 export class Session {
   private static _socket: WebSocket | null = null;
-  private static _messageQueue = [];
+  private static _messageQueue: CustomEvent<{
+    data: any;
+  }>[] = [];
   public static _history: Record<string, unknown>[] = [];
   private static _connecting = false;
-  public static providers = [];
+  public static providers: string[] = [];
+  public static _isReady: boolean = false;
 
   private static _disconnecting = false;
   private static _eventTarget = new EventTarget();
+  static _intervalId: NodeJS.Timeout;
 
   public static restoreOrStartNewSession() {
     if (Session.isConnected()) {
@@ -51,6 +55,19 @@ export class Session {
     }
   };
 
+  static dispatchEvent(eventType: string, data: any) {
+    const event = new CustomEvent(eventType, {
+      detail: { data },
+    });
+
+    if (Session._isReady) {
+      Session._eventTarget.dispatchEvent(event);
+    } else {
+      // Queue the event if not ready
+      Session._messageQueue.push(event);
+    }
+  }
+
   private static _setupSocket(): void {
     if (!Session._socket) {
       throw new Error("no socket");
@@ -78,13 +95,34 @@ export class Session {
           const event = new CustomEvent("sessionMessage", {
             detail: { data },
           });
-
-          Session._eventTarget.dispatchEvent(event);
+          Session._messageQueue.push(event);
         }
       } catch (err) {
-        return;
+        console.log(err);
       }
     };
+  }
+
+  static setReady(isReady: boolean) {
+    Session._isReady = isReady;
+    if (isReady) {
+      Session._startDispatch();
+    }
+  }
+
+  static _startDispatch() {
+    Session._intervalId = setInterval(() => {
+      if (Session._isReady && Session._messageQueue.length > 0) {
+        const event = Session._messageQueue.shift();
+        if (event) {
+          Session._eventTarget.dispatchEvent(event);
+        }
+      } else if (!Session._isReady) {
+        if (Session._intervalId) {
+          clearInterval(Session._intervalId);
+        }
+      }
+    }, 100); // 100 ms interval
   }
 
   public static addEventListener(

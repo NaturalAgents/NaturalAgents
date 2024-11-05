@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { RiArrowRightSLine } from "react-icons/ri";
 import { Button } from "@/components/ui/button";
 import { Session } from "@/services/session";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { FaEye } from "react-icons/fa";
 import { FaEyeSlash } from "react-icons/fa";
@@ -12,6 +12,7 @@ import { FaEyeSlash } from "react-icons/fa";
 import ProviderMenu from "./utils/providerMenu";
 import React from "react";
 import { useEditor } from "@/components/context/editorcontext";
+import { filterProviders } from "@/components/utils/providers";
 
 // Function to map color to classes
 const getColorClass = (color: string) => {
@@ -89,21 +90,41 @@ export const Bubble = createReactBlockSpec(
         setDisabled(true);
       };
 
+      useEffect(() => {
+        if (provider == "null" && Session.providers.length > 0 && !send) {
+          const filteredProviders = filterProviders(Session.providers);
+          const timeoutId = setTimeout(() => {
+            updateProvider(
+              `${filteredProviders[0].name}/${filteredProviders[0].models[0]}`
+            );
+          }, 1000);
+
+          // Cleanup the timeout if the component unmounts or the dependencies change
+          return () => clearTimeout(timeoutId);
+        }
+      }, [provider]);
+
       const handleLabelClick = () => {
-        setPanelVis(true);
-        setProviderMenu(<ProviderMenu />);
+        if (!send) {
+          setPanelVis(true);
+          setProviderMenu(
+            <ProviderMenu provider={provider} updateProvider={updateProvider} />
+          );
+        }
       };
 
       return (
         <Card className={`p-4 relative w-full`}>
           <Label
             htmlFor="cardInput" // Associate label with input
-            className={`absolute -top-2 left-2 text-xs text-black bg-opacity-75 px-1 ${colorClass} text-md flex items-center gap-2 cursor-pointer`}
+            className={`absolute -top-2 left-2 text-xs text-black bg-opacity-75 px-1 ${colorClass} text-md flex items-center gap-2 ${
+              !send && "cursor-pointer"
+            }`}
             onClick={handleLabelClick}
           >
             <span>{vis ? <FaEye /> : <FaEyeSlash />}</span> {text}{" "}
             &lt;model&gt;:
-            {provider}
+            {provider == "null" ? "None" : provider.split("/")[1]}
           </Label>
 
           <span className="text-sm underline">{prompt}</span>

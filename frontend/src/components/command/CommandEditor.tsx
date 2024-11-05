@@ -2,9 +2,7 @@
 
 import { BlockNoteEditor, filterSuggestionItems } from "@blocknote/core";
 import {
-  DragHandleButton,
   DragHandleMenu,
-  RemoveBlockItem,
   SideMenu,
   SideMenuController,
   SideMenuProps,
@@ -24,6 +22,7 @@ import {
   trackReferenceBlocks,
 } from "./customblocks/utils/commandEditorMenus";
 import { VisibleToggle } from "./customsidemenu/VisibilityToggle";
+import { Session } from "@/services/session";
 
 const Editor = ({ selectedFile }: { selectedFile: FileEntry | null }) => {
   const [initialContent, setInitialContent] = useState<
@@ -55,6 +54,12 @@ const Editor = ({ selectedFile }: { selectedFile: FileEntry | null }) => {
 
   useEffect(() => {
     read();
+
+    Session.send(
+      JSON.stringify({
+        action: "get_config",
+      })
+    );
   }, [selectedFile]);
 
   return (

@@ -266,8 +266,6 @@ const Header = () => {
     useState<PROVIDERS_TYPE | null>(null);
 
   useEffect(() => {
-    Session.startNewSession();
-
     const configInfo = async (event: Event) => {
       const customEvent = event as CustomEvent; // Type casting to CustomEvent
       const newMessage = customEvent.detail.data;

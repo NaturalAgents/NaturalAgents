@@ -45,6 +45,7 @@ export default function PlaygroundPage() {
       const newMessage = customEvent.detail.data;
       if (newMessage.finished) {
         setLoading(false);
+        Session.setReady(false);
       }
     };
 
@@ -76,10 +77,6 @@ export default function PlaygroundPage() {
         setLoading(false);
       }
     }
-  };
-
-  const handleCloseSideView = () => {
-    setPanelVis(false); // Close side view
   };
 
   const handlePreview = () => {
@@ -166,15 +163,9 @@ export default function PlaygroundPage() {
             {panelVis && (
               <div className="border border-gray-300 w-1/2 h-screen overflow-y-scroll	bg-white">
                 <ResizablePanel>
-                  {preview && ProviderMenu == null && (
-                    <OutputRender
-                      handleCloseSideView={handleCloseSideView}
-                      preview={preview}
-                      selectedFile={selectedFile}
-                    />
-                  )}
+                  {ProviderMenu == null && <OutputRender />}
 
-                  {ProviderMenu != null && ProviderMenu}
+                  {ProviderMenu != null && !loading && ProviderMenu}
                 </ResizablePanel>
               </div>
             )}

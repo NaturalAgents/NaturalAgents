@@ -1,29 +1,23 @@
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { ReactNode, useEffect, useState } from "react";
-import {
-  LLM_PROVIDERS,
-  PROVIDERS_TYPE,
-  destringifyProvider,
-  stringifyProvider,
-} from "@/components/utils/providers";
+import { useEffect, useState } from "react";
+import { PROVIDERS_TYPE, filterProviders } from "@/components/utils/providers";
 import { Session } from "@/services/session";
 import { Button } from "@/components/ui/button";
 import { RiArrowRightDoubleFill } from "react-icons/ri";
 import { Separator } from "@/components/ui/separator";
 import { useEditor } from "@/components/context/editorcontext";
 
-const ProviderMenu = ({}: {}) => {
+const ProviderMenu = ({
+  provider,
+  updateProvider,
+}: {
+  provider: string;
+  updateProvider: (provider: string) => void;
+}) => {
   const [providers, setProviders] = useState<PROVIDERS_TYPE[]>([]);
-  const [selectedProvider, setSelectedProvider] =
-    useState<PROVIDERS_TYPE | null>(null);
-  const [selectedModel, setSelectedModel] = useState<string>("");
+
+  const [selectedModel, setSelectedModel] = useState<null | string>(
+    provider == "null" ? null : provider
+  );
 
   const { setProviderMenu, setPanelVis } = useEditor();
 
@@ -33,25 +27,15 @@ const ProviderMenu = ({}: {}) => {
 
     // Only listen for available providers
     if (newMessage.type == "info") {
-      const providers = JSON.parse(newMessage.config);
-      const filteredProviders = LLM_PROVIDERS.filter((provider) =>
-        providers.includes(provider.name)
-      );
+      const rawProviders = JSON.parse(newMessage.config);
+      const filteredProviders = filterProviders(rawProviders);
 
-      //   // Determine is available providers contain current provider
-      //   const selectedExists = filteredProviders.filter(
-      //     (provider) => provider.name == name
-      //   );
-
-      //   setProviders(filteredProviders);
-
-      //   if (
-      //     filteredProviders.length > 0 &&
-      //     (propsProvider == null || selectedExists.length == 0)
-      //   ) {
-      //     setSelectedProvider(filteredProviders[0]);
-      //     setSelectedModel(filteredProviders[0].models[0]);
-      //   }
+      setProviders(filteredProviders);
+      if (selectedModel == "null" && filteredProviders.length > 0) {
+        updateProvider(
+          `${filteredProviders[0].name}/${filteredProviders[0].models[0]}`
+        );
+      }
     }
   };
 
@@ -63,14 +47,13 @@ const ProviderMenu = ({}: {}) => {
     };
   }, []);
 
-  // If new provider is selected assign default model
   useEffect(() => {
-    if (selectedProvider) {
-      setSelectedModel(selectedProvider.models[0]);
-    } else {
-      setSelectedModel("");
-    }
-  }, [selectedProvider]);
+    Session.send(
+      JSON.stringify({
+        action: "get_config",
+      })
+    );
+  }, []);
 
   const handlePanelView = () => {
     setProviderMenu(null);
@@ -88,7 +71,36 @@ const ProviderMenu = ({}: {}) => {
       <Separator />
 
       <div className="flex-1 overflow-auto mb-24 mt-4">
-        <div className="flex items-center justify-center"></div>
+        <div className="text-lg mb-6 px-8">Select Provider</div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 justify-items-center">
+          {providers.map((provider) =>
+            provider.models.map((model) => (
+              <div
+                key={`${provider.name}/${model}`}
+                onClick={() => {
+                  setSelectedModel(`${provider.name}/${model}`);
+                  updateProvider(`${provider.name}/${model}`);
+                }}
+                className={`p-4 border rounded-lg cursor-pointer shadow-sm hover:shadow-md transition-all w-32 h-32 flex flex-col items-center justify-center border-2 ${
+                  selectedModel && selectedModel === `${provider.name}/${model}`
+                    ? "border-green-500"
+                    : "border-gray-300"
+                }`}
+              >
+                <img
+                  src={provider.icon}
+                  alt={`${provider.name} icon`}
+                  className="h-12 w-12 mb-2"
+                />
+                <p className="text-center text-sm font-medium">
+                  {provider.name}
+                </p>
+                <p className="text-center text-xs">{model}</p>
+              </div>
+            ))
+          )}
+        </div>
       </div>
     </div>
   );
