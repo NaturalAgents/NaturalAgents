@@ -4,19 +4,14 @@ import { Card } from "@/components/ui/card";
 import { RiArrowRightSLine } from "react-icons/ri";
 import { Button } from "@/components/ui/button";
 import { Session } from "@/services/session";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { FaEye } from "react-icons/fa";
 import { FaEyeSlash } from "react-icons/fa";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { LLM_PROVIDERS, PROVIDERS_TYPE } from "@/components/utils/providers";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+
+import ProviderMenu from "./utils/providerMenu";
+import React from "react";
+import { useEditor } from "@/components/context/editorcontext";
 
 // Function to map color to classes
 const getColorClass = (color: string) => {
@@ -58,71 +53,29 @@ export const Bubble = createReactBlockSpec(
       sid: {
         default: "",
       },
+      provider: {
+        default: "null",
+      },
     },
     content: "inline", // No rich text content; the button itself is the main content
   },
   {
     render: (props) => {
-      const { text, color, prompt, send, sid, vis } = props.block.props;
+      const { text, color, prompt, send, sid, vis, provider } =
+        props.block.props;
       const colorClass = getColorClass(color);
       const [userInput, setUserInput] = useState("");
       const [disabled, setDisabled] = useState(false);
-      const [providers, setProviders] = useState<PROVIDERS_TYPE[]>([]);
-      const [selectedProvider, setSelectedProvider] =
-        useState<PROVIDERS_TYPE | null>(null);
+      const { setProviderMenu, setPanelVis } = useEditor();
 
-      const [selectedModel, setSelectedModel] = useState<string>("");
-
-      useEffect(() => {
-        const configInfo = async (event: Event) => {
-          const customEvent = event as CustomEvent; // Type casting to CustomEvent
-          const newMessage = customEvent.detail.data;
-
-          if (newMessage.type == "info") {
-            const providers = JSON.parse(newMessage.config);
-            const filteredProviders = LLM_PROVIDERS.filter((provider) =>
-              providers.includes(provider.name)
-            );
-
-            const name = selectedProvider ? selectedProvider.name : "";
-            const selectedExists = filteredProviders.filter(
-              (provider) => provider.name == name
-            );
-
-            setProviders(filteredProviders);
-            if (
-              filteredProviders.length > 0 &&
-              (!selectedProvider || selectedExists.length == 0)
-            ) {
-              console.log(selectedProvider, selectedExists);
-              setSelectedProvider(filteredProviders[0]);
-              setSelectedModel(filteredProviders[0].models[0]);
-            }
-          }
-        };
-
-        Session.addEventListener("sessionConfig", configInfo);
-
-        return () => {
-          Session.removeEventListener("finished", configInfo);
-        };
-      }, []);
-
-      useEffect(() => {
-        Session.send(
-          JSON.stringify({
-            action: "get_config",
-          })
-        );
-      }, []);
-
-      useEffect(() => {
-        if (selectedProvider) {
-          setSelectedModel(selectedProvider.models[0]);
-        } else {
-          setSelectedModel("");
-        }
-      }, [selectedProvider]);
+      const updateProvider = (provider: string) => {
+        props.editor.updateBlock(props.block, {
+          type: "bubble",
+          props: {
+            provider,
+          },
+        });
+      };
 
       const onClick = () => {
         Session.send(
@@ -136,73 +89,23 @@ export const Bubble = createReactBlockSpec(
         setDisabled(true);
       };
 
+      const handleLabelClick = () => {
+        setPanelVis(true);
+        setProviderMenu(<ProviderMenu />);
+      };
+
       return (
         <Card className={`p-4 relative w-full`}>
-          {/* Label with text */}
-          <Sheet>
-            <SheetTrigger asChild>
-              <Label
-                htmlFor="cardInput" // Associate label with input
-                className={`absolute -top-2 left-2 text-xs text-black bg-opacity-75 px-1 ${colorClass} text-md flex items-center gap-2 cursor-pointer`}
-              >
-                <span>{vis ? <FaEye /> : <FaEyeSlash />}</span> {text}{" "}
-                &lt;model&gt;:
-                {selectedModel}
-              </Label>
-            </SheetTrigger>
-            <SheetContent side="right">
-              <div className="mx-auto w-full max-w-sm">
-                <h2 className="text-lg font-semibold mb-4">
-                  Select a Provider
-                </h2>
-                <div className="flex flex-wrap gap-4">
-                  {providers.map((provider) => (
-                    <div
-                      key={provider.name}
-                      onClick={() => setSelectedProvider(provider)}
-                      className={`p-2 border rounded-md cursor-pointer ${
-                        selectedProvider?.name === provider.name
-                          ? "border-green-500"
-                          : "border-gray-300"
-                      }`}
-                    >
-                      <img
-                        src={provider.icon}
-                        alt={`${provider.name} icon`}
-                        className="h-8 w-8 mb-1"
-                      />
-                      <p className="text-sm">{provider.name}</p>
-                    </div>
-                  ))}
-                </div>
-                {selectedProvider && (
-                  <div className="mt-4">
-                    <h3 className="text-md font-semibold mb-2">
-                      Select a Model
-                    </h3>
-                    <Select
-                      value={selectedModel}
-                      onValueChange={(value) => setSelectedModel(value)}
-                    >
-                      <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder={selectedModel} />
-                      </SelectTrigger>
+          <Label
+            htmlFor="cardInput" // Associate label with input
+            className={`absolute -top-2 left-2 text-xs text-black bg-opacity-75 px-1 ${colorClass} text-md flex items-center gap-2 cursor-pointer`}
+            onClick={handleLabelClick}
+          >
+            <span>{vis ? <FaEye /> : <FaEyeSlash />}</span> {text}{" "}
+            &lt;model&gt;:
+            {provider}
+          </Label>
 
-                      <SelectContent>
-                        {selectedProvider.models.map((model) => (
-                          <SelectItem key={model} value={model}>
-                            {model}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                )}
-              </div>
-            </SheetContent>
-          </Sheet>
-
-          {/* 3-dotted menu button in top-right */}
           <span className="text-sm underline">{prompt}</span>
 
           {send ? (

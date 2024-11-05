@@ -18,3 +18,23 @@ export const LLM_PROVIDERS = [
 ];
 
 export type PROVIDERS_TYPE = { name: string; icon: string; models: string[] };
+
+export const stringifyProvider = (provider: PROVIDERS_TYPE, model: string) => {
+  return `${provider.name}/${model}`;
+};
+
+export const destringifyProvider = (name: string): null | PROVIDERS_TYPE => {
+  if (name == "null") {
+    return null;
+  }
+  const provider_name = name.split("/")[0];
+  const selectedExists = LLM_PROVIDERS.filter(
+    (provider) => provider.name == provider_name
+  );
+
+  if (selectedExists.length == 0) {
+    return null;
+  }
+
+  return selectedExists[0];
+};

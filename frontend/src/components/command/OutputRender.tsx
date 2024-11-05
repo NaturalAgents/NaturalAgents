@@ -121,6 +121,7 @@ const OutputRender = ({
             send: true,
             sid: sidRef.current,
             vis: true,
+            provider: "null",
           },
           content: [],
           children: [],

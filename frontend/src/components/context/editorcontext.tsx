@@ -15,6 +15,12 @@ export type EditorContextType = {
   setTitle: (title: string) => void;
   document: string;
   setDocument: (content: string) => void;
+  ProviderMenu: JSX.Element | null;
+  setProviderMenu: (element: JSX.Element | null) => void;
+  preview: boolean;
+  setPreview: (preview: boolean) => void;
+  panelVis: boolean;
+  setPanelVis: (vis: boolean) => void;
 };
 
 export const EditorContext = createContext<EditorContextType | undefined>(
@@ -24,7 +30,14 @@ export const EditorContext = createContext<EditorContextType | undefined>(
 export const EditorProvider = ({ children }: { children: ReactNode }) => {
   // State for the editor title
   const [title, setTitle] = useState("Untitled");
+  const [preview, setPreview] = useState(true);
+  const [panelVis, setPanelVis] = useState(false);
   const [document, setDocument] = useState("[{}]");
+
+  const Div = () => {
+    return <div>test</div>;
+  };
+  const [ProviderMenu, setProviderMenu] = useState<JSX.Element | null>(null);
 
   // Ref for the editor instance
   const editorRef = useState<
@@ -33,7 +46,19 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <EditorContext.Provider
-      value={{ editorRef, title, setTitle, setDocument, document }}
+      value={{
+        editorRef,
+        title,
+        setTitle,
+        setDocument,
+        document,
+        ProviderMenu,
+        setProviderMenu,
+        preview,
+        setPreview,
+        panelVis,
+        setPanelVis,
+      }}
     >
       {children}
     </EditorContext.Provider>

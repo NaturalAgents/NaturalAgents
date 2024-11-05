@@ -22,11 +22,19 @@ const OutputRender = dynamic(() => import("./command/OutputRender"), {
 });
 
 export default function PlaygroundPage() {
-  const [isSideViewOpen, setIsSideViewOpen] = useState(true);
   const [selectedFile, setSelectedFile] = useState<FileEntry | null>(null);
-  const [preview, setPreview] = useState(true);
   const [loading, setLoading] = useState(false);
-  const { editorRef, title, setDocument } = useEditor();
+  const {
+    editorRef,
+    title,
+    setDocument,
+    ProviderMenu,
+    preview,
+    setPreview,
+    panelVis,
+    setPanelVis,
+    setProviderMenu,
+  } = useEditor();
   const { toast } = useToast();
 
   useEffect(() => {
@@ -50,7 +58,7 @@ export default function PlaygroundPage() {
   const handleRunClick = async () => {
     setDocument("[{}] override"); // override indicator clears preview component only when "run" is pressed
     setLoading(true);
-    setIsSideViewOpen(true); // Open side view when Run is clicked
+    setPanelVis(true); // Open side view when Run is clicked
     setPreview(false);
 
     if (editorRef) {
@@ -71,14 +79,15 @@ export default function PlaygroundPage() {
   };
 
   const handleCloseSideView = () => {
-    setIsSideViewOpen(false); // Close side view
+    setPanelVis(false); // Close side view
   };
 
   const handlePreview = () => {
     if (!loading) {
       setPreview(true);
+      setProviderMenu(null);
     }
-    setIsSideViewOpen(true);
+    setPanelVis(true);
   };
 
   const handleSaveFile = async () => {
@@ -154,14 +163,18 @@ export default function PlaygroundPage() {
               <Editor selectedFile={selectedFile} />
             </ResizablePanel>
 
-            {isSideViewOpen && (
+            {panelVis && (
               <div className="border border-gray-300 w-1/2 h-screen overflow-y-scroll	bg-white">
                 <ResizablePanel>
-                  <OutputRender
-                    handleCloseSideView={handleCloseSideView}
-                    preview={preview}
-                    selectedFile={selectedFile}
-                  />
+                  {preview && ProviderMenu == null && (
+                    <OutputRender
+                      handleCloseSideView={handleCloseSideView}
+                      preview={preview}
+                      selectedFile={selectedFile}
+                    />
+                  )}
+
+                  {ProviderMenu != null && ProviderMenu}
                 </ResizablePanel>
               </div>
             )}
