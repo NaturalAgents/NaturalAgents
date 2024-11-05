@@ -3,6 +3,8 @@ name: Resolve Issues with OpenHands
 on:
   issues:
     types: [labeled]
+  issues:
+    types: [labeled]
 
 jobs:
   call-openhands-resolver:
