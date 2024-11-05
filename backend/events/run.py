@@ -47,7 +47,12 @@ class Run:
                 node.add_mention(item["props"]["blockID"], item["props"]["nodeID"])
             else:
                 content = item["content"][0]["text"] if item["content"] else ""
-                node = BlockNode(id=id, node_type='paragraph', prompt=content)
+                style = {
+                    "textColor": item["props"].get("textColor", "default"),
+                    "backgroundColor": item["props"].get("backgroundColor", "default"),
+                    "textAlignment": item["props"].get("textAlignment", "left")
+                }
+                node = BlockNode(id=id, node_type='paragraph', prompt=content, style=style)
 
             return node
 
