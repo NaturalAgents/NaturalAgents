@@ -23,6 +23,7 @@ const OutputRender = dynamic(() => import("./command/OutputRender"), {
 
 export default function PlaygroundPage() {
   const [isSideViewOpen, setIsSideViewOpen] = useState(true);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [selectedFile, setSelectedFile] = useState<FileEntry | null>(null);
   const [preview, setPreview] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -44,6 +45,18 @@ export default function PlaygroundPage() {
 
     return () => {
       Session.removeEventListener("finished", finishRun);
+    };
+  }, []);
+
+  useEffect(() => {
+    const updateWindowWidth = () => {
+      setWindowWidth(window.innerWidth);
+    };
+
+    window.addEventListener("resize", updateWindowWidth);
+
+    return () => {
+      window.removeEventListener("resize", updateWindowWidth);
     };
   }, []);
 
@@ -109,7 +122,7 @@ export default function PlaygroundPage() {
       <FileExplorer setSelectedFile={setSelectedFile} />
 
       <div className="flex-1 h-full">
-        <div className="hidden h-full flex-col md:flex ">
+        <div className=" h-full flex-col md:flex ">
           <div className="container flex flex-col items-start justify-between space-y-2 py-4 sm:flex-row sm:items-center sm:space-y-0 md:h-16 bg-white">
             <h2 className="text-md font-semibold pl-8">Playground</h2>
             {/* Run button at top-right */}
@@ -149,13 +162,16 @@ export default function PlaygroundPage() {
 
           <Separator />
 
-          <ResizablePanelGroup direction="horizontal">
-            <ResizablePanel>
-              <Editor selectedFile={selectedFile} />
-            </ResizablePanel>
+          <ResizablePanelGroup  direction="horizontal">
+            {(!isSideViewOpen || (windowWidth >= 768)) && (
+              <ResizablePanel>
+                <Editor selectedFile={selectedFile} />
+              </ResizablePanel>
+            )}
 
             {isSideViewOpen && (
-              <div className="border border-gray-300 w-1/2 h-screen overflow-y-scroll	bg-white">
+              <div className="border border-gray-300 w-full md:w-1/2 h-screen overflow-y-scroll bg-white">
+
                 <ResizablePanel>
                   <OutputRender
                     handleCloseSideView={handleCloseSideView}
