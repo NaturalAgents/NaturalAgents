@@ -2,7 +2,7 @@ from memory.history import ShortTermMemory
 
 
 class BlockNode:
-    def __init__(self, id: str, node_type: str, prompt: str = None, file_type: str = None, vis: bool = False, provider="null"):
+    def __init__(self, id: str, node_type: str, prompt: str = None, file_type: str = None, vis: bool = False, provider="null", style=None):
         self.id = id
         self.node_type = node_type  # type of the node (e.g., <command>:generate)
         self.prompt = prompt  # prompt text for certain types of nodes
@@ -13,6 +13,7 @@ class BlockNode:
         self.incoming = []
         self.memory = None
         self.processor = None
+        self.style = style  # optional style attributes
         if provider == "null":
             self.provider = 'gpt-4o'
         else:

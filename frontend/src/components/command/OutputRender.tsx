@@ -140,8 +140,22 @@ const OutputRender = () => {
       }
 
       if (newMessage.output) {
-        const block = await editor.tryParseMarkdownToBlocks(newMessage.output);
-        contentCopy.push(...block);
+        if (newMessage.type === "paragraph" && newMessage.style) {
+          contentCopy.push({
+            id: uuidv4(),
+            type: "paragraph",
+            props: {
+              textColor: newMessage.style.textColor,
+              backgroundColor: newMessage.style.backgroundColor,
+              textAlignment: newMessage.style.textAlignment,
+            },
+            content: [{ type: "text", text: newMessage.output }],
+            children: [],
+          });
+        } else {
+          const block = await editor.tryParseMarkdownToBlocks(newMessage.output);
+          contentCopy.push(...block);
+        }
       }
 
       setInitialContent(contentCopy);
