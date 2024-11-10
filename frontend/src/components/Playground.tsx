@@ -172,7 +172,7 @@ export default function PlaygroundPage() {
 
           <ResizablePanelGroup  direction="horizontal">
 
-            <ResizablePanel className={`${isSideViewOpen && windowWidth < 768 ? 'block' : 'block'}`}>
+            <ResizablePanel className={`${panelVis && windowWidth < 768 ? 'hidden' : 'block'}`}>
               <Editor selectedFile={selectedFile} />
             </ResizablePanel>
             
