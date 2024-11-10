@@ -132,7 +132,7 @@ export default function PlaygroundPage() {
       <div className="flex-1 h-full">
         <div className=" h-full flex-col md:flex ">
           <div className="container flex flex-col items-start justify-between space-y-2 py-4 sm:flex-row sm:items-center sm:space-y-0 md:h-16 bg-white">
-            <h2 className="text-md font-semibold pl-8">Doideira</h2>
+            <h2 className="text-md font-semibold pl-8">Playground</h2>
             {/* Run button at top-right */}
             <div className="flex space-x-4 justify-end pr-4">
               <Button
