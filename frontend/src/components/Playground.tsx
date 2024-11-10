@@ -23,7 +23,7 @@ const OutputRender = dynamic(() => import("./command/OutputRender"), {
 
 export default function PlaygroundPage() {
   const [isSideViewOpen, setIsSideViewOpen] = useState(true);
-  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const [windowWidth, setWindowWidth] = useState(0); 
   const [selectedFile, setSelectedFile] = useState<FileEntry | null>(null);
   const [preview, setPreview] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -49,14 +49,15 @@ export default function PlaygroundPage() {
   }, []);
 
   useEffect(() => {
-    const updateWindowWidth = () => {
-      setWindowWidth(window.innerWidth);
-    };
-
-    window.addEventListener("resize", updateWindowWidth);
-
+    const setInitialWidth = () => setWindowWidth(window.innerWidth);
+  
+    if (typeof window !== "undefined") {
+      setInitialWidth(); 
+      window.addEventListener("resize", setInitialWidth); 
+    }
+  
     return () => {
-      window.removeEventListener("resize", updateWindowWidth);
+      window.removeEventListener("resize", setInitialWidth);
     };
   }, []);
 
@@ -124,7 +125,7 @@ export default function PlaygroundPage() {
       <div className="flex-1 h-full">
         <div className=" h-full flex-col md:flex ">
           <div className="container flex flex-col items-start justify-between space-y-2 py-4 sm:flex-row sm:items-center sm:space-y-0 md:h-16 bg-white">
-            <h2 className="text-md font-semibold pl-8">Playground</h2>
+            <h2 className="text-md font-semibold pl-8">Doideira</h2>
             {/* Run button at top-right */}
             <div className="flex space-x-4 justify-end pr-4">
               <Button
@@ -163,12 +164,11 @@ export default function PlaygroundPage() {
           <Separator />
 
           <ResizablePanelGroup  direction="horizontal">
-            {(!isSideViewOpen || (windowWidth >= 768)) && (
-              <ResizablePanel>
-                <Editor selectedFile={selectedFile} />
-              </ResizablePanel>
-            )}
 
+            <ResizablePanel className={`${isSideViewOpen && windowWidth < 768 ? 'block' : 'block'}`}>
+              <Editor selectedFile={selectedFile} />
+            </ResizablePanel>
+            
             {isSideViewOpen && (
               <div className="border border-gray-300 w-full md:w-1/2 h-screen overflow-y-scroll bg-white">
 
