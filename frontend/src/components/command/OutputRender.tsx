@@ -10,7 +10,6 @@ import { schema } from "./customschema/Schema";
 import { Session } from "@/services/session";
 import { v4 as uuidv4 } from "uuid";
 import { useEditor } from "../context/editorcontext";
-import { FileEntry } from "../file-explorer/FileExplorer";
 
 const processPreviewPayload = (document: string) => {
   const blocks = JSON.parse(document);
@@ -83,18 +82,10 @@ const processPreviewPayload = (document: string) => {
   return processedBlocks;
 };
 
-const OutputRender = ({
-  handleCloseSideView,
-  preview = false,
-  selectedFile,
-}: {
-  handleCloseSideView: () => void;
-  preview: boolean;
-  selectedFile: FileEntry | null;
-}) => {
+const OutputRender = () => {
   const [initialContent, setInitialContent] = useState([{}]);
 
-  const { document } = useEditor();
+  const { document, preview, setPanelVis } = useEditor();
 
   const editor = useCreateBlockNote({ schema, initialContent });
   const sidRef = useRef<string>("");
@@ -103,6 +94,8 @@ const OutputRender = ({
     const handleSessionMessage = async (event: Event) => {
       const customEvent = event as CustomEvent; // Type casting to CustomEvent
       const newMessage = customEvent.detail.data;
+
+      console.log("new message", newMessage);
 
       const currentContent = editor.document;
       const contentCopy = [...currentContent];
@@ -121,6 +114,7 @@ const OutputRender = ({
             send: true,
             sid: sidRef.current,
             vis: true,
+            provider: "null",
           },
           content: [],
           children: [],
@@ -155,9 +149,11 @@ const OutputRender = ({
     };
 
     Session.addEventListener("sessionMessage", handleSessionMessage);
+    Session.setReady(true);
 
     return () => {
       Session.removeEventListener("sessionMessage", handleSessionMessage);
+      Session.setReady(false);
     };
   }, [editor]);
 
@@ -175,7 +171,7 @@ const OutputRender = ({
   return (
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-between p-4">
-        <Button variant={"ghost"} onClick={handleCloseSideView}>
+        <Button variant={"ghost"} onClick={() => setPanelVis(false)}>
           <RiArrowRightDoubleFill size={20} />
         </Button>
         <h1 className="text-lg flex-1 text-center">
