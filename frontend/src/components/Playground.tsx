@@ -22,6 +22,8 @@ const OutputRender = dynamic(() => import("./command/OutputRender"), {
 });
 
 export default function PlaygroundPage() {
+  const [isSideViewOpen, setIsSideViewOpen] = useState(true);
+  const [windowWidth, setWindowWidth] = useState(0); 
   const [selectedFile, setSelectedFile] = useState<FileEntry | null>(null);
   const [loading, setLoading] = useState(false);
   const {
@@ -52,6 +54,19 @@ export default function PlaygroundPage() {
 
     return () => {
       Session.removeEventListener("finished", finishRun);
+    };
+  }, []);
+
+  useEffect(() => {
+    const setInitialWidth = () => setWindowWidth(window.innerWidth);
+  
+    if (typeof window !== "undefined") {
+      setInitialWidth(); 
+      window.addEventListener("resize", setInitialWidth); 
+    }
+  
+    return () => {
+      window.removeEventListener("resize", setInitialWidth);
     };
   }, []);
 
@@ -115,7 +130,7 @@ export default function PlaygroundPage() {
       <FileExplorer setSelectedFile={setSelectedFile} />
 
       <div className="flex-1 h-full">
-        <div className="hidden h-full flex-col md:flex ">
+        <div className=" h-full flex-col md:flex ">
           <div className="container flex flex-col items-start justify-between space-y-2 py-4 sm:flex-row sm:items-center sm:space-y-0 md:h-16 bg-white">
             <h2 className="text-md font-semibold pl-8">Playground</h2>
             {/* Run button at top-right */}
@@ -155,13 +170,15 @@ export default function PlaygroundPage() {
 
           <Separator />
 
-          <ResizablePanelGroup direction="horizontal">
-            <ResizablePanel>
+          <ResizablePanelGroup  direction="horizontal">
+
+            <ResizablePanel className={`${panelVis && windowWidth < 768 ? 'hidden' : 'block'}`}>
               <Editor selectedFile={selectedFile} />
             </ResizablePanel>
-
+            
             {panelVis && (
-              <div className="border border-gray-300 w-1/2 h-screen overflow-y-scroll	bg-white">
+              <div className="border border-gray-300 w-full md:w-1/2 h-screen overflow-y-scroll bg-white">
+
                 <ResizablePanel>
                   {ProviderMenu == null && <OutputRender />}
 
