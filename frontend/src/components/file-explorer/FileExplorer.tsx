@@ -93,24 +93,27 @@ const FileExplorer = ({
             />
           )}
 
-        <FileTree
-          directoryTree={directoryTree}
-          navigateTo={navigateTo}
-          getDirectoryTree={getDirectoryTree}
-          currentPath={currentPath}
-          setSelectedFile={setSelectedFile}
-          updateFile={(updatedFile: FileEntry) => {
-            setDirectoryTree((prev) =>
-              prev.map((file) =>
-                file.path === updatedFile.path ? { ...file, ...updatedFile } : file
-              )
-            );
+          <FileTree
+            directoryTree={directoryTree}
+            navigateTo={navigateTo}
+            getDirectoryTree={getDirectoryTree}
+            currentPath={currentPath}
+            setSelectedFile={setSelectedFile}
+            updateFile={(updatedFile: FileEntry) => {
+              setDirectoryTree((prev) =>
+                prev.map((file) =>
+                  file.path === updatedFile.path ? { ...file, ...updatedFile } : file
+                )
+              );
 
-            setSelectedFile((prev) =>
-              prev && prev.path === updatedFile.path ? updatedFile : prev
-            );
-          }}
-        />
+              setSelectedFile((prev) => {
+                if (prev && prev.path === updatedFile.path) {
+                  return updatedFile; 
+                }
+                return prev; 
+              });
+            }}
+          />
         </ul>
       </div>
     </div>
