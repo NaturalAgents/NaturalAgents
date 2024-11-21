@@ -20,7 +20,7 @@ export enum FILETYPE {
 const FileExplorer = ({
   setSelectedFile,
 }: {
-  setSelectedFile: (fileentry: FileEntry) => void;
+  setSelectedFile: React.Dispatch<React.SetStateAction<FileEntry | null>>;
 }) => {
   // format {name: "test", path: ".", is_file: true, is_directory: false}
   const [directoryTree, setDirectoryTree] = useState<FileEntry[]>([
@@ -99,6 +99,20 @@ const FileExplorer = ({
             getDirectoryTree={getDirectoryTree}
             currentPath={currentPath}
             setSelectedFile={setSelectedFile}
+            updateFile={(updatedFile: FileEntry) => {
+              setDirectoryTree((prev) =>
+                prev.map((file) =>
+                  file.path === updatedFile.path ? { ...file, ...updatedFile } : file
+                )
+              );
+
+              setSelectedFile((prev) => {
+                if (prev && prev.path === updatedFile.path) {
+                  return updatedFile; 
+                }
+                return prev; 
+              });
+            }}
           />
         </ul>
       </div>
