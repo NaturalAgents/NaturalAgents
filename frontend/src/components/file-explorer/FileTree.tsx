@@ -7,6 +7,7 @@ interface FileListProps {
   getDirectoryTree: () => void;
   currentPath: string;
   setSelectedFile: (fileentry: FileEntry) => void;
+  updateFile: (updatedFile: FileEntry) => void;
 }
 
 const FileTree: React.FC<FileListProps> = ({
@@ -15,6 +16,7 @@ const FileTree: React.FC<FileListProps> = ({
   getDirectoryTree,
   currentPath,
   setSelectedFile,
+  updateFile,
 }) => {
   return (
     <>
@@ -26,6 +28,7 @@ const FileTree: React.FC<FileListProps> = ({
           getDirectoryTree={getDirectoryTree}
           currentPath={currentPath}
           setSelectedFile={setSelectedFile}
+          updateFile={updateFile}
         />
       ))}
     </>

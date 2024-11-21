@@ -27,12 +27,13 @@ interface FileItemProps {
   setSelectedFile: (fileentry: FileEntry) => void;
 }
 
-const FileItem: React.FC<FileItemProps> = ({
+const FileItem: React.FC<FileItemProps & { updateFile: (file: FileEntry) => void }> = ({
   entry,
   navigateTo,
   getDirectoryTree,
   currentPath,
   setSelectedFile,
+  updateFile,
 }) => {
   const [isRenaming, setIsRenaming] = useState(false);
   const [newName, setNewName] = useState(entry.name);
@@ -62,7 +63,14 @@ const FileItem: React.FC<FileItemProps> = ({
       } else {
         await handleFolder(currentPath, entry.name, "rename", newName);
       }
+      const updatedEntry = {
+        ...entry,
+        name: newName,
+        path: `${currentPath}/${newName}`,
+      };
+      updateFile(updatedEntry);
       setIsRenaming(false);
+      setSelectedFile({ ...entry, name: newName, path: `${currentPath}/${newName}` });
       getDirectoryTree();
     } catch (error) {
       console.error("Error renaming file or folder:", error);
