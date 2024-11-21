@@ -25,9 +25,10 @@ import {
 } from "./customblocks/utils/commandEditorMenus";
 import { VisibleToggle } from "./customsidemenu/VisibilityToggle";
 
-const Editor = () => {
-  const { selectedFile, editorRef, setTitle, title, setDocument } = useEditor();
-  const [initialContent, setInitialContent] = useState<(typeof schema.PartialBlock)[] | null>(null);
+const Editor = ({ selectedFile }: { selectedFile: FileEntry | null }) => {
+  const [initialContent, setInitialContent] = useState<
+    (typeof schema.PartialBlock)[] | null
+  >(null);
 
   const [referenceOptions, setReferenceOptions] = useState<any>([]);
 
@@ -38,6 +39,7 @@ const Editor = () => {
     return BlockNoteEditor.create({ schema, initialContent });
   }, [initialContent]);
 
+  const { editorRef, setTitle, title, setDocument } = useEditor();
   editorRef.current = editor;
 
   const read = async () => {

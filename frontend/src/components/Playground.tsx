@@ -106,7 +106,7 @@ export default function PlaygroundPage() {
 
   return (
     <div className="flex h-screen bg-gray-100">
-      <FileExplorer />
+      <FileExplorer setSelectedFile={setSelectedFile} />
 
       <div className="flex-1 h-full">
         <div className="hidden h-full flex-col md:flex ">
@@ -151,7 +151,7 @@ export default function PlaygroundPage() {
 
           <ResizablePanelGroup direction="horizontal">
             <ResizablePanel>
-              <Editor/>
+              <Editor selectedFile={selectedFile} />
             </ResizablePanel>
 
             {isSideViewOpen && (

@@ -4,7 +4,6 @@ import { AiOutlineArrowLeft } from "react-icons/ai";
 import { fetchDirectoryTree } from "../services/api";
 import FileTree from "./FileTree";
 import NewItemInput from "./NewItemInput";
-import { useEditor } from "../context/editorcontext"; // Importa o contexto
 
 export interface FileEntry {
   name: string;
@@ -18,8 +17,12 @@ export enum FILETYPE {
   DIR = "dir",
 }
 
-const FileExplorer = () => {
-  const { setSelectedFile } = useEditor();
+const FileExplorer = ({
+  setSelectedFile,
+}: {
+  setSelectedFile: (fileentry: FileEntry) => void;
+}) => {
+  // format {name: "test", path: ".", is_file: true, is_directory: false}
   const [directoryTree, setDirectoryTree] = useState<FileEntry[]>([
     { name: "test", path: ".", is_file: true, is_directory: false },
   ]);
