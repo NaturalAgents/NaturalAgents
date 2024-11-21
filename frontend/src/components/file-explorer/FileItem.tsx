@@ -18,6 +18,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button"; // Import ShadCN button component
 import { FileEntry } from "./FileExplorer";
 import { handleFile, handleFolder } from "../services/api";
+import { useEditor } from "../context/editorcontext";
 
 interface FileItemProps {
   entry: FileEntry;
@@ -37,6 +38,7 @@ const FileItem: React.FC<FileItemProps> = ({
   const [isRenaming, setIsRenaming] = useState(false);
   const [newName, setNewName] = useState(entry.name);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const { selectedFile, setSelectedFile: setEditorSelectedFile } = useEditor();
 
   const handleDelete = async () => {
     try {
@@ -64,6 +66,10 @@ const FileItem: React.FC<FileItemProps> = ({
       }
       setIsRenaming(false);
       getDirectoryTree();
+
+      if (selectedFile && selectedFile.path === entry.path) {
+        setEditorSelectedFile({ ...selectedFile, name: newName });
+      }
     } catch (error) {
       console.error("Error renaming file or folder:", error);
     }
